@@ -13,3 +13,7 @@ struct RootTabView: View {
 }
 
 extension Color { static let plum = Color(red: 0.35, green: 0.08, blue: 0.24) }
+
+extension ShapeStyle where Self == Color {
+    static var plum: Color { Color.plum }
+}

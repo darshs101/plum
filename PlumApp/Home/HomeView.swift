@@ -1,5 +1,4 @@
 import SwiftUI
-import PlumDomain
 
 /// The chronological feed for people you follow. The data source can be swapped for
 /// a store later; keeping the display fixtures here makes the first-run experience
