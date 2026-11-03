@@ -119,7 +119,7 @@ struct CreatePostView: View {
             VStack(spacing: 14) {
                 ForEach($dishes) { $dish in
                     DishEditor(dish: $dish, canRemove: dishes.count > 1) {
-                        dishes.removeAll { $0.id == dish.wrappedValue.id }
+                        dishes.removeAll { $0.id == dish.id }
                     }
                 }
                 Button {
