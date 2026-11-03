@@ -20,6 +20,7 @@
 		A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31EFD115951F898BD54F1A /* SocialActionsView.swift */; };
 		A541DC3805073495C353361B /* DirectoryServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */; };
 		AA410463365A322ED218D223 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116AF927487E0D2528A13D22 /* HomeView.swift */; };
+		AE505F68FA165620BDE85131 /* SupabaseDirectoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EAB5471F38F3C0628515EBE /* SupabaseDirectoryService.swift */; };
 		C219121FB1F1AE6931325182 /* SocialClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAAA2D4134E9DB025A6ADCB /* SocialClient.swift */; };
 		D1F637679320255865EE6263 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20243E690023D4C7E4C75A13 /* Models.swift */; };
 		D8592E5F9146239C4F70B369 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E30C557FB2CB6BEC8DA25574 /* Supabase */; };
@@ -39,6 +40,7 @@
 		7DBA31CE8BF567E7B225A935 /* PlumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumApp.swift; sourceTree = "<group>"; };
 		7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryServices.swift; sourceTree = "<group>"; };
 		84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interfaces.swift; sourceTree = "<group>"; };
+		8EAB5471F38F3C0628515EBE /* SupabaseDirectoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseDirectoryService.swift; sourceTree = "<group>"; };
 		8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		DB54A85AEE591AEC218D4966 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfiguration.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */,
+				8EAB5471F38F3C0628515EBE /* SupabaseDirectoryService.swift */,
 			);
 			path = Infrastructure;
 			sourceTree = "<group>";
@@ -245,6 +248,7 @@
 				A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */,
 				C219121FB1F1AE6931325182 /* SocialClient.swift in Sources */,
 				132D4A9235353D6350A9536C /* SupabaseConfiguration.swift in Sources */,
+				AE505F68FA165620BDE85131 /* SupabaseDirectoryService.swift in Sources */,
 				124B4F044BC77C7B4D1E6096 /* WelcomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

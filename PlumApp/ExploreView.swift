@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ExploreView: View {
-    @State private var store = ExploreStore()
+    @State private var store = ExploreStore(service: PlumServices.directory)
 
     var body: some View {
         NavigationStack {

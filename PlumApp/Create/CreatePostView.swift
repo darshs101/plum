@@ -2,7 +2,7 @@ import Foundation
 import PhotosUI
 import SwiftUI
 struct CreatePostView: View {
-    @State private var store = ComposerStore()
+    @State private var store = ComposerStore(service: PlumServices.directory)
     @State private var restaurantQuery = ""
     @State private var selectedRestaurant: Restaurant?
     @State private var dishes = [DishDraft()]
