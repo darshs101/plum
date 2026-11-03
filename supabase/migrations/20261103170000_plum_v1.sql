@@ -1,8 +1,8 @@
 -- Plum v1. Additive initial schema. Apply with `supabase db push` only after linking
 -- the intended project; this migration contains no secrets or destructive DDL.
 create extension if not exists pgcrypto;
-create extension if not exists pg_trgm;
 create schema if not exists private;
+create extension if not exists pg_trgm with schema extensions;
 
 create type public.account_visibility as enum ('public', 'private');
 create type public.follow_status as enum ('requested', 'approved');
@@ -157,8 +157,16 @@ create trigger comments_notify after insert on public.comments for each row exec
 create trigger follows_notify_insert after insert on public.follows for each row execute procedure public.create_social_notification();
 create trigger follows_notify_approval after update of status on public.follows for each row when (old.status is distinct from new.status) execute procedure public.create_social_notification();
 
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+revoke all on function public.enforce_post_dish_restaurant() from public, anon, authenticated;
+revoke all on function public.queue_notification() from public, anon, authenticated;
+revoke all on function public.enforce_message_membership() from public, anon, authenticated;
+revoke all on function public.create_social_notification() from public, anon, authenticated;
+revoke all on function public.merge_dish(uuid, uuid) from public, anon, authenticated;
+revoke all on function public.merge_restaurant(uuid, uuid) from public, anon, authenticated;
+
 create or replace function public.search_public(search_text text, cuisine_filter text default null, neighborhood_filter text default null, price_filter smallint default null)
-returns table(kind text, id uuid, label text, subtitle text, score real) language sql stable security invoker set search_path = '' as $$
+returns table(kind text, id uuid, label text, subtitle text, score real) language sql stable security invoker set search_path = public, extensions as $$
   with q as (select lower(trim(search_text)) needle), results as (
     select 'restaurant'::text kind,r.id,r.name label,coalesce(r.neighborhood,r.address) subtitle,case when lower(r.name)=(select needle from q) then 100 else similarity(lower(r.name),(select needle from q)) end score from public.restaurants r,q where not r.is_removed and (lower(r.name) % q.needle or exists(select 1 from public.restaurant_aliases a where a.restaurant_id=r.id and a.normalized_alias % q.needle)) and (cuisine_filter is null or r.cuisine=cuisine_filter) and (neighborhood_filter is null or r.neighborhood=neighborhood_filter) and (price_filter is null or r.price_level=price_filter)
     union all select 'dish',d.id,d.name, r.name,case when lower(d.name)=(select needle from q) then 100 else similarity(lower(d.name),(select needle from q)) end from public.dishes d join public.restaurants r on r.id=d.restaurant_id,q where not d.is_removed and not r.is_removed and (lower(d.name) % q.needle or exists(select 1 from public.dish_aliases a where a.dish_id=d.id and a.normalized_alias % q.needle))

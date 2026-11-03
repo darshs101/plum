@@ -28,7 +28,8 @@ Source: `.plans/plum-ios-v1-spec.md`. This is the release checklist; each item n
 ## Current evidence / blockers
 
 - 2026-11-03: `swift build` passes; XcodeGen regenerated `Plum.xcodeproj`; `xcodebuild ... build CODE_SIGNING_ALLOWED=NO` produced `Plum.app`; the app installed and launched on iPhone 17 Pro (iOS 26.5).
-- The workspace has no Supabase project ref, management token/MCP connection, project URL, or publishable key. The versioned migration was **not applied**. Until those are provided, live auth/data/media, APNs configuration, migration/advisor execution, and separate-account privacy/persistence testing cannot be honestly marked complete.
+- 2026-11-03: Supabase MCP applied `plum_v1`, security hardening, and the `pg_trgm` schema migration to the connected production project. All v1 public tables have RLS enabled; advisor checks leave one documented warning for the authenticated, mutual-follow-guarded DM RPC that intentionally requires `SECURITY DEFINER`.
+- Live auth/data/media, APNs configuration, and separate-account privacy/persistence testing remain unfinished until the app receives its concrete Supabase repository adapter and test users/device configuration.
 
 ## Out of scope guardrails
 
