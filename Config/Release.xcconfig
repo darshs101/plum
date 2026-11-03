@@ -1,0 +1,5 @@
+// Release credentials must be injected by the archive environment or CI. Never
+// put a service-role/secret key in this app target.
+SUPABASE_URL =
+SUPABASE_PUBLISHABLE_KEY =
+#include? "Secrets.xcconfig"

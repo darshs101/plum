@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		04E6BC26AF31BCDDD3D9C9EB /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE6C171CD3CD7826061A37B /* ExploreView.swift */; };
+		124B4F044BC77C7B4D1E6096 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB54A85AEE591AEC218D4966 /* WelcomeView.swift */; };
+		132D4A9235353D6350A9536C /* SupabaseConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */; };
 		22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CCA213BC9909E7BDD25DED /* RootTabView.swift */; };
 		432036CE95704620218CF616 /* PlumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBA31CE8BF567E7B225A935 /* PlumApp.swift */; };
 		4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */; };
@@ -15,23 +17,45 @@
 		755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */; };
 		82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */; };
 		8624863B5B4310927D954018 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */; };
+		A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31EFD115951F898BD54F1A /* SocialActionsView.swift */; };
+		A541DC3805073495C353361B /* DirectoryServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */; };
 		AA410463365A322ED218D223 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116AF927487E0D2528A13D22 /* HomeView.swift */; };
+		C219121FB1F1AE6931325182 /* SocialClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAAA2D4134E9DB025A6ADCB /* SocialClient.swift */; };
 		D1F637679320255865EE6263 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20243E690023D4C7E4C75A13 /* Models.swift */; };
+		D8592E5F9146239C4F70B369 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E30C557FB2CB6BEC8DA25574 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0AE6C171CD3CD7826061A37B /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
+		0C31EFD115951F898BD54F1A /* SocialActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialActionsView.swift; sourceTree = "<group>"; };
 		116AF927487E0D2528A13D22 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		20243E690023D4C7E4C75A13 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		26E78E8DD8D6C5D9990F01E3 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
 		38205E8225ABE3E289D31FCE /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		54CCA213BC9909E7BDD25DED /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		6EAAA2D4134E9DB025A6ADCB /* SocialClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialClient.swift; sourceTree = "<group>"; };
 		6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumStyle.swift; sourceTree = "<group>"; };
 		7DBA31CE8BF567E7B225A935 /* PlumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumApp.swift; sourceTree = "<group>"; };
+		7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryServices.swift; sourceTree = "<group>"; };
 		84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interfaces.swift; sourceTree = "<group>"; };
+		8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		DB54A85AEE591AEC218D4966 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfiguration.swift; sourceTree = "<group>"; };
 		E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostView.swift; sourceTree = "<group>"; };
 		E74D5EA79E2D5804799F1BED /* Plum.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Plum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8F367726B655B3AA1C31A73B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D8592E5F9146239C4F70B369 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		07B01AD40D2A27FEDCD96B92 /* PlumDomain */ = {
@@ -53,12 +77,37 @@
 			path = Create;
 			sourceTree = "<group>";
 		};
+		189CD73E04C071C457694ADB /* Directory */ = {
+			isa = PBXGroup;
+			children = (
+				7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */,
+			);
+			path = Directory;
+			sourceTree = "<group>";
+		};
 		4CC769EBE65B49FC51A61B93 /* Home */ = {
 			isa = PBXGroup;
 			children = (
 				116AF927487E0D2528A13D22 /* HomeView.swift */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		4CFA0705EBC63D56151ED360 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */,
+				26E78E8DD8D6C5D9990F01E3 /* Release.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		67072D2170E152CF7610631A /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */,
+			);
+			path = Infrastructure;
 			sourceTree = "<group>";
 		};
 		684B0D8E122C5E9DC3B95B9E /* Shared */ = {
@@ -72,10 +121,20 @@
 		688190F90C23D0E388F4EDD6 = {
 			isa = PBXGroup;
 			children = (
+				4CFA0705EBC63D56151ED360 /* Config */,
 				DB32E17E4BAB65CB7662D7ED /* PlumApp */,
 				07B01AD40D2A27FEDCD96B92 /* PlumDomain */,
 				FAFF14FCFA1F9D5F10205CF7 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		9A0DF3374218B292A012D4CE /* Social */ = {
+			isa = PBXGroup;
+			children = (
+				0C31EFD115951F898BD54F1A /* SocialActionsView.swift */,
+				6EAAA2D4134E9DB025A6ADCB /* SocialClient.swift */,
+			);
+			path = Social;
 			sourceTree = "<group>";
 		};
 		DB32E17E4BAB65CB7662D7ED /* PlumApp */ = {
@@ -85,11 +144,23 @@
 				7DBA31CE8BF567E7B225A935 /* PlumApp.swift */,
 				38205E8225ABE3E289D31FCE /* ProfileView.swift */,
 				54CCA213BC9909E7BDD25DED /* RootTabView.swift */,
+				EA25B654BCBBB9FDD0E01585 /* Auth */,
 				16A22207E28642215025A04E /* Create */,
+				189CD73E04C071C457694ADB /* Directory */,
 				4CC769EBE65B49FC51A61B93 /* Home */,
+				67072D2170E152CF7610631A /* Infrastructure */,
 				684B0D8E122C5E9DC3B95B9E /* Shared */,
+				9A0DF3374218B292A012D4CE /* Social */,
 			);
 			path = PlumApp;
+			sourceTree = "<group>";
+		};
+		EA25B654BCBBB9FDD0E01585 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				DB54A85AEE591AEC218D4966 /* WelcomeView.swift */,
+			);
+			path = Auth;
 			sourceTree = "<group>";
 		};
 		FAFF14FCFA1F9D5F10205CF7 /* Products */ = {
@@ -108,6 +179,7 @@
 			buildConfigurationList = AFE5AC1314A8D00A0F2C48EA /* Build configuration list for PBXNativeTarget "Plum" */;
 			buildPhases = (
 				58C2019EA4C1985FDE222E9A /* Sources */,
+				8F367726B655B3AA1C31A73B /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -115,6 +187,7 @@
 			);
 			name = Plum;
 			packageProductDependencies = (
+				E30C557FB2CB6BEC8DA25574 /* Supabase */,
 			);
 			productName = Plum;
 			productReference = E74D5EA79E2D5804799F1BED /* Plum.app */;
@@ -140,6 +213,9 @@
 			);
 			mainGroup = 688190F90C23D0E388F4EDD6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FF459994A1ECCDB5BFA3763A /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FAFF14FCFA1F9D5F10205CF7 /* Products */;
 			projectDirPath = "";
@@ -156,6 +232,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8624863B5B4310927D954018 /* CreatePostView.swift in Sources */,
+				A541DC3805073495C353361B /* DirectoryServices.swift in Sources */,
 				04E6BC26AF31BCDDD3D9C9EB /* ExploreView.swift in Sources */,
 				AA410463365A322ED218D223 /* HomeView.swift in Sources */,
 				4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */,
@@ -165,6 +242,10 @@
 				5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */,
 				22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */,
 				755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */,
+				A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */,
+				C219121FB1F1AE6931325182 /* SocialClient.swift in Sources */,
+				132D4A9235353D6350A9536C /* SupabaseConfiguration.swift in Sources */,
+				124B4F044BC77C7B4D1E6096 /* WelcomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,12 +310,15 @@
 		};
 		28E0C114521A09BCBF66A0E6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 26E78E8DD8D6C5D9990F01E3 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				INFOPLIST_KEY_SUPABASE_PUBLISHABLE_KEY = "$(SUPABASE_PUBLISHABLE_KEY)";
+				INFOPLIST_KEY_SUPABASE_URL = "$(SUPABASE_URL)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -312,12 +396,15 @@
 		};
 		BF5E460A4C41E1F2CB1D8D49 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				INFOPLIST_KEY_SUPABASE_PUBLISHABLE_KEY = "$(SUPABASE_PUBLISHABLE_KEY)";
+				INFOPLIST_KEY_SUPABASE_URL = "$(SUPABASE_URL)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -352,6 +439,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FF459994A1ECCDB5BFA3763A /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 2.55.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E30C557FB2CB6BEC8DA25574 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FF459994A1ECCDB5BFA3763A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F3896ED7D93380E10DE0F834 /* Project object */;
 }

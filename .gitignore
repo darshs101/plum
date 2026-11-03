@@ -2,3 +2,4 @@
 DerivedData/
 *.xcuserstate
 .DS_Store
+Config/Secrets.xcconfig

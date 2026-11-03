@@ -1,0 +1,5 @@
+// This file is safe to commit. Create Config/Secrets.xcconfig from the example
+// to supply local development credentials; it is ignored by git.
+SUPABASE_URL =
+SUPABASE_PUBLISHABLE_KEY =
+#include? "Secrets.xcconfig"
