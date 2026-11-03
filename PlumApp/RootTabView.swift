@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct RootTabView: View {
+    @State private var openedPost: OpenedPost?
+    private struct OpenedPost: Identifiable { let id: UUID }
     @State private var selection: AppTab
 
     init() {
@@ -15,12 +17,14 @@ struct RootTabView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            HomeView().tabItem { Label("Home", systemImage: "house") }.tag(AppTab.home)
-            ExploreView().tabItem { Label("Explore", systemImage: "magnifyingglass") }.tag(AppTab.explore)
-            CreatePostView().tabItem { Label("Create", systemImage: "plus") }.tag(AppTab.create)
-            ProfileView().tabItem { Label("Profile", systemImage: "person") }.tag(AppTab.profile)
+            HomeView().tabItem { Image(systemName: "house").accessibilityLabel("Home") }.tag(AppTab.home)
+            ExploreView().tabItem { Image(systemName: "magnifyingglass").accessibilityLabel("Explore") }.tag(AppTab.explore)
+            CreatePostView().tabItem { Image(systemName: "plus").accessibilityLabel("Create") }.tag(AppTab.create)
+            ProfileView().tabItem { Image(systemName: "person").accessibilityLabel("Profile") }.tag(AppTab.profile)
         }
         .tint(.plum)
+        .onReceive(NotificationCenter.default.publisher(for: .plumOpenPost)) { notification in if let id = notification.object as? UUID { openedPost = OpenedPost(id: id) } }
+        .sheet(item: $openedPost) { post in NavigationStack { PostDetailView(id: post.id) } }
     }
 }
 

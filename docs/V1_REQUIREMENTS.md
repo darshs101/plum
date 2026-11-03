@@ -1,36 +1,36 @@
 # Plum iOS v1 requirement checklist
 
-Source: `.plans/plum-ios-v1-spec.md`. This is the release checklist; each item needs implementation and an acceptance check before marking complete.
+Source of truth: `.plans/plum-ios-v1-spec.md`. **Full v1 is not signed off.** Implementation and verification are separate; an implemented row with pending acceptance is not complete. Detailed evidence: `docs/FUNCTIONAL_VERIFICATION.md`.
 
-| ID | Requirement | Implementation / acceptance check | Status |
-|---|---|---|---|
-| R1 | SwiftUI iPhone app; client-neutral API backend | iOS target + Supabase REST/Auth/Storage contracts; build `Plum.app` | Implemented; remote integration blocked |
-| R2 | Auth: Apple, Google, email/username/password; stable internal user separate from identities | Supabase Auth config, `profiles`/`auth_identities`, session UI | Gap |
-| R3 | Onboarding city/neighborhood, logging/saving prompts, all skippable | SwiftUI onboarding persisted per profile | Gap |
-| R4 | Restaurant location: name/address/photo; immediate shared/searchable public record | schema + create/search UI + storage | Gap |
-| R5 | Public dish directory; typeahead; no auto merge; duplicate reports + admin merge; aliases resolve | dish/alias tables, RPC/search, report/admin operations | Gap |
-| R6 | Create/edit/delete multi-dish post at one restaurant; 0.5–5 half stars; photo required; optional caption/date; slideshow | transactional post API, composer, Photos upload, edit/delete tests | Gap |
-| R7 | Public restaurant/dish aggregates and activity; latest eligible user rating; private excluded | aggregate query/views/RPC and policy tests | Gap |
-| R8 | Public/private profiles and approval-based follows; follower removal; privacy across all surfaces | `follows` policies + visibility helpers + profile/follow UI + two-user RLS tests | Gap |
-| R9 | Profile identity/counts, visual review grid, public collections/rankings | profile screen with live data/states | Partial (placeholder only) |
-| R10 | Saved Places private default; public/private unranked/ranked collections; restaurant/post items; manual rank | collections schema, RLS, collection UI/reordering | Gap |
-| R11 | Visible users like/comment/reply; own/owner comment delete; mutual-only mentions; notifications | social schema/RLS/triggers, UI and notification list | Gap |
-| R12 | Mutual-follow one-to-one text/post-share DMs; realtime/member guard | conversation schema/RLS/realtime UI | Gap |
-| R13 | Chronological following-only Home; useful Atlanta starter state | feed query/UI, pagination/loading/empty/error | Partial (local fixture only) |
-| R14 | Explore public-only: exact-prioritized free-text restaurants/dishes/users/collections; filters; curated/nearby/popular | search RPC/indexes + Explore states | Partial (local fixture only) |
-| R15 | Icon-only four-tab navigation; Profile bell notifications | tab correctness + notifications screen | Partial (placeholder only) |
-| R16 | Push: like/comment/reply/follow/request/approval; device permission/token/APNs server handling | device tokens, server triggers/function, permission registration | Gap |
-| R17 | Report posts/accounts/photos and admin console: triage/remove/edit/merge/suspend/audit | reports/admin schema and admin console/API | Gap |
-| R18 | Original/transformed post/restaurant media; private permission-aware delivery | storage buckets/policies/upload + signed URL delivery test | Gap |
-| R19 | RLS structural privacy, data preservation, migrations, no service role in client | additive migration + policy test scaffold committed; remote advisor/policy execution pending project access | Implemented locally; remote verification blocked |
-| R20 | Loading, empty, error, permissions, persistence after relaunch and separate-account restrictions | observable stores/UI; simulator validates retryable unconfigured state; two-account persistence/RLS tests pending project access | Partial; remote verification blocked |
+| ID | Requirement | Implementation | Acceptance / evidence and remaining checks | Status |
+|---|---|---|---|---|
+| R1 | SwiftUI iPhone; client-neutral backend | `project.yml`, `PlumApp`, Supabase REST/Auth/Storage/RPCs | Domain package builds separately; actual Debug iOS app produces `Plum.app` and runs on iPhone 18 Pro | Core verified |
+| R2 | Apple, Google, email/username/password; stable identity | `Auth/WelcomeView`, `SessionStore`, shared `PlumServices`, `auth_identities` sync | Email password login and relaunch verified. Public signup blocked by hosted confirmation/email limit. Providers disabled. Username login client/Edge source prepared; deployment and endpoint rate limiting pending | External blockers; provider/username checks pending |
+| R3 | Skippable city/neighborhood and log/save prompts | `OnboardingView`, profile onboarding fields | Onboarding completed through real UI and persisted. Skip code persists an empty optional location; explicit skip UI check pending | Implemented; partial UI verification |
+| R4 | Location name/address/photo; immediately shared/searchable | `AddRestaurantView`, `SupabaseDirectoryService.createRestaurant`, private storage + signed delivery | Live restaurant/photo creation and exact search verified. Full add-restaurant form UI walk pending | API verified |
+| R5 | Shared dishes; typeahead; duplicate reports/admin merges/aliases | Composer + dish identity mapping; `ReportContentView`, admin merge RPCs + history | Dish creation, alias search after admin merge, dish suggestions during composer UI verified. Restaurant merge/reference edge cases need expanded verification | Implemented; partial merge verification |
+| R6 | Multi-dish 0.5–5 half stars; photos/caption/date; slideshow; edit/delete | Composer, `EditPostView`, `PostDetailView`, atomic `save_post`, deferred integrity triggers | Two-dish/photo post published in simulator. API create/edit/invalid rollback checked. Complete edit/delete UI walkthrough pending | Core create verified; remaining UI checks |
+| R7 | Public aggregates/activity; latest eligible user rating; private excluded | Public aggregate views, weighted restaurant aggregation, directory detail | Private rating exclusion checked with separate accounts. Multi-user repeat-visit aggregate edge cases need expanded regression coverage | Implemented; partial aggregate verification |
+| R8 | Public/private accounts; approval follows; follower removal; structural privacy | Profile UI, follow management, policy helpers/grants, approval and immutable-column restrictions | Forged approval denied; nonfollower post/photo denied; approved follower allowed. Remaining profile/follower-removal UI checks pending | Privacy API verified |
+| R9 | Profile identity/counts; visual grid; collections/rankings | `MemberProfileView`, real counts/grid/collection links | Simulator checked profile, private account identity and Saved Places. Large-profile pagination needs expanded UI coverage | Core UI verified |
+| R10 | Private-default Saved Places; public/private ranked/unranked lists; restaurant/post links; manual order | Collection views, add/save/remove actions, atomic `reorder_collection` | Default Saved Places, saved restaurant persistence, ranked collection create/order checked. Collection settings (title/privacy/ranked kind/delete) implemented; full settings/ranked-list UI acceptance remains pending | Partial |
+| R11 | Likes/comments/replies/deletes; mutual mentions; notifications | Post detail, comment/report flows, triggers and mention rows | Live likes, comments, replies, recipient notification, mutual mention and nonmutual rejection checked. Complete delete/comment UI and post-mention UI checks pending | API verified; partial UI verification |
+| R12 | Mutual-only 1:1 text/post-share messages; realtime | Inbox/conversation/share views; guarded start RPC; fixed member policies; Realtime publication | Real two-account send/read/share and WebSocket reception checked. Reconnect/background and full DM UI walk pending | API + realtime verified |
+| R13 | Chronological following Home; useful Atlanta starter | Following-only ordered query + pagination; empty-state Explore link | Empty starter seen in simulator. No editorial seed data approved; useful Atlanta starter suggestions are not complete | Partial; editorial data needed |
+| R14 | Public-only Explore; exact-priority all entities; filters; curated/local/popular | Search RPC, cancel-safe store, navigable results, public aggregates | Exact query → restaurant detail passes simulator test. Prefix matching/filter RPC implemented. Curated content absent; full filter/entity matrix pending | Core search verified; partial discovery acceptance |
+| R15 | Four icon-only tabs; Profile notification bell | `RootTabView`, Profile toolbar, `LiveNotificationsView` | Tabs navigated in simulator; bell leads to live notifications. Complete notification tap/read-state UI check pending | Implemented; partial UI verification |
+| R16 | Push for all six social events; permission/token/APNs delivery | `NotificationRegistration`, notification/outbox triggers, server worker source | Event persistence checked; worker not deployed. Apple capabilities, APNs secrets, scheduler, and physical-device delivery required | External blockers; delivery unverified |
+| R17 | Reports + moderation console; triage/remove/edit/merge/suspend/audit | `AdminConsoleView`, server-gated moderation RPCs, merge/audit tables | API report, edit, triage, suspension with existing JWT, alias merge verified; admin claim removed after QA. Staff UI and all removal/merge cases pending | Implemented; partial moderation verification |
+| R18 | Originals/transformed media; private permission-aware delivery | Original + bounded JPEG uploads, private storage and signed URLs, removed-media policy | Simulator photo publish + API storage/privacy checked. Large-photo/HEIC/original retention and photo moderation edge cases pending | Implemented; partial media verification |
+| R19 | RLS, migrations, data preservation; no service-role in client | Versioned additive repairs, safe predicates, protected admin columns, isolated server worker | Two-account RLS checks pass; no destructive schema changes or app service key. Advisor warnings reviewed; authenticated admin/DM/identity RPCs are intentionally server-guarded | Core security verified; release audit pending |
+| R20 | Loading/empty/error/permissions; persistence/relaunch and separate-account restrictions | Live screens with retry/error/loading states, session restore, system photo picker | Real account login/profile/save/search/post UI tests; terminate/relaunch; API session refresh and two-account privacy verified. Every permission/error/accessibility state not fully walked | Core verified; full matrix pending |
 
-## Current evidence / blockers
+## Applied repair migrations (2026-11-03)
 
-- 2026-11-03: `swift build` passes; XcodeGen regenerated `Plum.xcodeproj`; `xcodebuild ... build CODE_SIGNING_ALLOWED=NO` produced `Plum.app`; the app installed and launched on iPhone 17 Pro (iOS 26.5).
-- 2026-11-03: Supabase MCP applied `plum_v1`, security hardening, and the `pg_trgm` schema migration to the connected production project. All v1 public tables have RLS enabled; advisor checks leave one documented warning for the authenticated, mutual-follow-guarded DM RPC that intentionally requires `SECURITY DEFINER`.
-- Live auth/data/media, APNs configuration, and separate-account privacy/persistence testing remain unfinished until the app receives its concrete Supabase repository adapter and test users/device configuration.
+`functional_repairs`, `privacy_and_realtime_repairs`, `profile_search_rank_repairs`, `social_moderation_repairs`, `post_integrity_and_aggregate_repairs`, `merge_reference_repairs`, `media_integrity_repairs`, `admin_rpc_permissions`, `active_storage_accounts`.
+
+These supplement the previously applied initial v1 schema, security hardening, and pg_trgm schema migration. No existing user data was dropped. QA entities are scoped to isolated integration accounts, not described as production content.
 
 ## Out of scope guardrails
 
-No maps, reservation/menu/delivery, algorithmic Home ranking, Android, group/photo DMs, blocking/muting, user directory editing, pre-publication restaurant moderation, automatic duplicate merging, email verification/age gate/mandatory consent, or favorite cuisine/neighborhood profile fields.
+No maps, reservations/menu/delivery, algorithmic Home ranking, Android, group/photo DMs, blocking/muting, user directory editing, prepublication restaurant moderation, automatic duplicate merges, mandatory email verification/age gate/consent, or favorite cuisine/neighborhood profile fields.

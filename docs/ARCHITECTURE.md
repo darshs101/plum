@@ -36,3 +36,11 @@ Core tables follow the v1 entity list: profiles/auth_identities/device_tokens/fo
 4. Social worker: only Home/Profile/social/onboarding/notification screens plus stores/adapters consuming the contract; it may not alter schema or composer/directory screens.
 
 Backend contracts are accepted first; client workers may create compiling interfaces/stubs which the coordinator binds to the implementation.
+
+## Runtime integration corrections
+
+All app adapters share `PlumServices.client`; independent client instances must not own separate auth sessions. `PlumAPI` owns typed live social reads and actions; `SupabaseDirectoryService` owns directory/composer requests. Both use the same JWT, Storage, and Realtime client.
+
+Photo uploads keep a bounded, orientation-normalized JPEG at the linked storage path and the original at `<storage_path>.original`. Both are private and use the same owner/post folder permission model. Display uses short-lived signed URLs. Post writes go through `save_post`; deferred constraints also reject incomplete direct table writes at commit.
+
+XcodeGen writes the Supabase build-setting placeholders into the source Info.plist. An xcconfig URL must be written `https:/$()/PROJECT.supabase.co` so Xcode does not treat `//` as a comment. The project URL/publishable key belong in the ignored `Config/Secrets.xcconfig`; server/APNs secrets never belong there.

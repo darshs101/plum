@@ -15,6 +15,9 @@ struct ExploreView: View {
                 .padding(.horizontal, 20).padding(.vertical, 18)
             }
             .background(PlumStyle.cream.ignoresSafeArea())
+            .navigationTitle("Explore").navigationBarTitleDisplayMode(.inline)
+            .toolbar { NavigationLink { AddRestaurantView { _ in Task { await store.loadLanding() } } } label: { Image(systemName: "plus") }.accessibilityLabel("Add restaurant") }
+            .refreshable { await store.loadLanding(); await store.search() }
             .task { await store.loadLanding() }
             .task(id: searchKey) { await store.search() }
         }
@@ -30,7 +33,7 @@ struct ExploreView: View {
     private var searchField: some View {
         HStack(spacing: 11) {
             Image(systemName: "magnifyingglass").foregroundStyle(.plum.opacity(0.7))
-            TextField("Search restaurants, dishes, people, lists", text: $store.query).textInputAutocapitalization(.words).foregroundStyle(.plum)
+            TextField("Search restaurants, dishes, people, lists", text: $store.query).textInputAutocapitalization(.never).autocorrectionDisabled().submitLabel(.search).foregroundStyle(.plum)
             if !store.query.isEmpty { Button { store.query = "" } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel("Clear search") }
         }.padding(.horizontal, 16).frame(height: 53).background(.white.opacity(0.72), in: Capsule()).overlay(Capsule().stroke(.plum.opacity(0.12)))
     }
@@ -40,8 +43,8 @@ struct ExploreView: View {
                 filterButton("All", store.filters == .init()) { store.filters = .init() }
                 filterButton("Italian", store.filters.cuisine == "Italian") { store.filters.cuisine = store.filters.cuisine == "Italian" ? nil : "Italian" }
                 filterButton("Old Fourth Ward", store.filters.neighborhood == "Old Fourth Ward") { store.filters.neighborhood = store.filters.neighborhood == "Old Fourth Ward" ? nil : "Old Fourth Ward" }
-                filterButton("$–$$", store.filters.priceLevel == 2) { store.filters.priceLevel = store.filters.priceLevel == 2 ? nil : 2 }
-                filterButton("$$$+", store.filters.priceLevel == 3) { store.filters.priceLevel = store.filters.priceLevel == 3 ? nil : 3 }
+                filterButton("$$", store.filters.priceLevel == 2) { store.filters.priceLevel = store.filters.priceLevel == 2 ? nil : 2 }
+                filterButton("$$$", store.filters.priceLevel == 3) { store.filters.priceLevel = store.filters.priceLevel == 3 ? nil : 3 }
             }
         }
     }
@@ -57,11 +60,21 @@ struct ExploreView: View {
     private func errorState(_ error: String) -> some View {
         ContentUnavailableView("Explore needs a connection", systemImage: "wifi.exclamationmark", description: Text(error)).frame(maxWidth: .infinity).padding(.vertical, 40)
     }
+    @ViewBuilder private func destination(_ result: DirectoryResult) -> some View {
+        switch result.kind {
+        case .restaurant: DirectoryDetailView(restaurantID: result.id)
+        case .dish: if let restaurantID = result.restaurantID { DirectoryDetailView(restaurantID: restaurantID, dishID: result.id) }
+        case .user: MemberProfileView(id: result.id)
+        case .collection: CollectionDetailView(id: result.id)
+        }
+    }
     private func resultSection(_ title: String, _ results: [DirectoryResult]) -> some View {
         VStack(alignment: .leading, spacing: 13) {
             Text(title).font(.caption2.weight(.bold)).tracking(1.35).foregroundStyle(.plum.opacity(0.68))
             if results.isEmpty { ContentUnavailableView("Nothing quite like that", systemImage: "fork.knife", description: Text("Try another restaurant, dish, person, or collection.")) }
-            else { ForEach(results) { ResultRow(result: $0) } }
+            else { ForEach(results) { result in
+                NavigationLink { destination(result) } label: { ResultRow(result: result) }.buttonStyle(.plain)
+            } }
         }
     }
 }

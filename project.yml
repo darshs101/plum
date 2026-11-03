@@ -17,6 +17,8 @@ targets:
       path: PlumApp/Info.plist
       properties:
         CFBundleDisplayName: Plum
+        SUPABASE_URL: $(SUPABASE_URL)
+        SUPABASE_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)
         CFBundleURLTypes:
           - CFBundleURLSchemes:
               - plum
@@ -38,3 +40,22 @@ targets:
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig
+  PlumUITests:
+    info:
+      path: Tests/PlumUITests/Info.plist
+      properties:
+        PLUM_QA_EMAIL: $(PLUM_QA_EMAIL)
+        PLUM_QA_PASSWORD: $(PLUM_QA_PASSWORD)
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/PlumUITests
+    dependencies:
+      - target: Plum
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plum.app.uitests
+        GENERATE_INFOPLIST_FILE: NO
+        TEST_TARGET_NAME: Plum
+        INFOPLIST_KEY_PLUM_QA_EMAIL: $(PLUM_QA_EMAIL)
+        INFOPLIST_KEY_PLUM_QA_PASSWORD: $(PLUM_QA_PASSWORD)

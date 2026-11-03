@@ -12,6 +12,7 @@ struct CreatePostView: View {
     @State private var visitDate = Date()
     @State private var includeVisitDate = false
     @State private var didPost = false
+    @State private var addingRestaurant = false
 
     private var matchingRestaurants: [DirectoryResult] {
         guard !restaurantQuery.isEmpty, selectedRestaurant == nil else { return [] }
@@ -33,6 +34,7 @@ struct CreatePostView: View {
                     dishesSection
                     photosSection
                     detailsSection
+                    if let error = store.error { Text(error).foregroundStyle(.red) }
                     postButton
                 }
                 .padding(20)
@@ -46,6 +48,7 @@ struct CreatePostView: View {
             } message: {
                 Text("Your post is ready for your friends to discover.")
             }
+            .sheet(isPresented: $addingRestaurant) { AddRestaurantView { restaurant in selectedRestaurant = restaurant; store.selectedRestaurant = restaurant } }
             .onChange(of: pickerItems) { _, newItems in
                 Task { await loadPhotos(newItems) }
             }
@@ -74,6 +77,7 @@ struct CreatePostView: View {
                         Spacer()
                         Button("Change") {
                             self.selectedRestaurant = nil
+                            store.selectedRestaurant = nil
                             restaurantQuery = ""
                         }
                         .font(.subheadline.weight(.semibold))
@@ -85,11 +89,13 @@ struct CreatePostView: View {
                 }
                 .padding(14)
 
+                if selectedRestaurant == nil { Button("Add a restaurant location") { addingRestaurant = true }.padding(12) }
                 if !matchingRestaurants.isEmpty {
                     Divider()
                     ForEach(matchingRestaurants) { restaurant in
                         Button {
                             selectedRestaurant = Restaurant(id: restaurant.id, name: restaurant.title, neighborhood: restaurant.subtitle, address: restaurant.subtitle, cuisine: "", priceLevel: restaurant.priceLevel ?? 0)
+                            store.selectedRestaurant = selectedRestaurant
                             restaurantQuery = restaurant.title
                         } label: {
                             HStack {
@@ -142,12 +148,12 @@ struct CreatePostView: View {
             VStack(alignment: .leading, spacing: 12) {
                 PhotosPicker(selection: $pickerItems, maxSelectionCount: 8, matching: .images) {
                     HStack(spacing: 14) {
-                        Image(systemName: photoCount == 0 ? "camera.fill" : "photo.stack.fill")
+                        Image(systemName: "photo.stack.fill")
                             .font(.title3)
                             .frame(width: 42, height: 42)
                             .background(Color.plum.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(photoCount == 0 ? "Add your photos" : "\(photoCount) photo\(photoCount == 1 ? "" : "s") selected")
+                            Text("Add or change photos")
                                 .fontWeight(.semibold)
                             Text("A photo can feature more than one dish")
                                 .font(.caption)
@@ -161,6 +167,7 @@ struct CreatePostView: View {
                     .background(.background, in: RoundedRectangle(cornerRadius: PlumStyle.cornerRadius))
                 }
                 .buttonStyle(.plain)
+                if photoCount > 0 { Text("\(photoCount) photos selected").font(.caption) }
                 if photoCount == 0 {
                     Label("At least one photo is needed to post.", systemImage: "info.circle")
                         .font(.caption)
@@ -215,6 +222,7 @@ struct CreatePostView: View {
     }
 
     private func resetComposer() {
+        store.reset()
         restaurantQuery = ""
         selectedRestaurant = nil
         dishes = [DishDraft()]
@@ -233,17 +241,18 @@ struct CreatePostView: View {
     private func loadPhotos(_ items: [PhotosPickerItem]) async {
         var uploads: [PhotoUploadDraft] = []
         for item in items {
-            if let data = try? await item.loadTransferable(type: Data.self) {
-                uploads.append(.init(id: UUID(), data: data, contentType: "image/jpeg", linkedDishIDs: []))
+            if let data = try? await item.loadTransferable(type: Data.self), let jpeg = PhotoProcessing.preview(data) {
+                uploads.append(.init(id: UUID(), data: jpeg, contentType: "image/jpeg", linkedDishIDs: [], originalData: data, originalContentType: item.supportedContentTypes.first?.preferredMIMEType))
             }
         }
         store.photos = uploads
         photoCount = uploads.count
+        if uploads.count != items.count { store.error = "Some photos could not be loaded. Please choose them again." }
     }
 
     private func publish() async {
         store.selectedRestaurant = selectedRestaurant
-        store.dishes = dishes.map { .init(id: $0.id, dishID: nil, proposedName: $0.name, rating: $0.rating) }
+        store.dishes = dishes.map { .init(id: $0.id, dishID: $0.dishID, proposedName: $0.name, rating: $0.rating) }
         store.caption = caption
         store.includesVisitDate = includeVisitDate
         store.visitDate = visitDate
@@ -273,13 +282,13 @@ private struct DishEditor: View {
             }
             TextField("Search or name a dish", text: $dish.name)
                 .textInputAutocapitalization(.words)
-                .onChange(of: dish.name) { _, _ in onSearch() }
+                .onChange(of: dish.name) { _, newValue in if !suggestions.contains(where: { $0.id == dish.dishID && $0.title == newValue }) { dish.dishID = nil }; onSearch() }
                 .padding(12)
                 .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
             if !suggestions.isEmpty {
                 FlowLayout(spacing: 8) {
                     ForEach(suggestions.prefix(4)) { result in
-                        Button(result.title) { dish.name = result.title }
+                        Button(result.title) { dish.name = result.title; dish.dishID = result.id }
                             .font(.caption.weight(.medium))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 7)
@@ -355,5 +364,6 @@ private struct FlowLayout: Layout {
 private struct DishDraft: Identifiable {
     let id = UUID()
     var name = ""
+    var dishID: UUID?
     var rating = 4.5
 }
