@@ -1,0 +1,21 @@
+name: Plum
+options:
+  minimumXcodeGenVersion: 2.38.0
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+targets:
+  Plum:
+    type: application
+    platform: iOS
+    sources:
+      - path: PlumApp
+      - path: Sources/PlumDomain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plum.app
+        INFOPLIST_KEY_CFBundleDisplayName: Plum
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
