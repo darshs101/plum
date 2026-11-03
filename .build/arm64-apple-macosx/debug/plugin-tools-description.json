@@ -1,0 +1,241 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.PlumDomain-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/sources",
+      "importPath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Interfaces.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Models.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/SampleData.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "PlumDomain",
+      "moduleOutputPath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/Modules/PlumDomain.swiftmodule",
+      "objects" : [
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.swift.o",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.swift.o",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j18",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/include/PlumDomain-Swift.h",
+        "-swift-version",
+        "6",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "project_called_plum_use_a27c812c"
+      ],
+      "outputFileMapPath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/Modules/PlumDomain.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Interfaces.swift",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Models.swift",
+        "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/SampleData.swift"
+      ],
+      "tempsPath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "PlumDomain" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "PlumDomain",
+      "-package-name",
+      "project_called_plum_use_a27c812c",
+      "-c",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Interfaces.swift",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Models.swift",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/SampleData.swift",
+      "-I",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j18",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/include/PlumDomain-Swift.h",
+      "-swift-version",
+      "6",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "project_called_plum_use_a27c812c",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "PlumDomain" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Interfaces.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Models.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/SampleData.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/sources"
+    },
+    "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}

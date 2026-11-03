@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/primary.swiftdeps"
+  },
+  "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/runner.d",
+    "object": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumPackageTests.build/runner.dia"
+  }
+}

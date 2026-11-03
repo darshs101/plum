@@ -1,0 +1,26 @@
+{
+  "": {
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/primary.swiftdeps"
+  },
+  "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Interfaces.swift": {
+    "dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.d",
+    "object": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.swift.o",
+    "swiftmodule": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces~partial.swiftmodule",
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.swiftdeps",
+    "diagnostics": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Interfaces.dia"
+  },
+  "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/Models.swift": {
+    "dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.d",
+    "object": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.swift.o",
+    "swiftmodule": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.swiftdeps",
+    "diagnostics": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/Models.dia"
+  },
+  "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/Sources/PlumDomain/SampleData.swift": {
+    "dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.d",
+    "object": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.swift.o",
+    "swiftmodule": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData~partial.swiftmodule",
+    "swift-dependencies": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.swiftdeps",
+    "diagnostics": "/Users/darshshetty/.superset/worktrees/plum-869dc29e/project-called-plum-use-a27c812c/.build/arm64-apple-macosx/debug/PlumDomain.build/SampleData.dia"
+  }
+}
