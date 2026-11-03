@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var store = SocialStore()
+    @StateObject private var store = SocialStore(client: PlumServices.social)
     var body: some View {
         NavigationStack {
             Group {
