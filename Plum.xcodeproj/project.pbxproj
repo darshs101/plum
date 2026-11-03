@@ -1,0 +1,357 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04E6BC26AF31BCDDD3D9C9EB /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE6C171CD3CD7826061A37B /* ExploreView.swift */; };
+		22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CCA213BC9909E7BDD25DED /* RootTabView.swift */; };
+		432036CE95704620218CF616 /* PlumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBA31CE8BF567E7B225A935 /* PlumApp.swift */; };
+		4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */; };
+		5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38205E8225ABE3E289D31FCE /* ProfileView.swift */; };
+		755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */; };
+		82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */; };
+		8624863B5B4310927D954018 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */; };
+		AA410463365A322ED218D223 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116AF927487E0D2528A13D22 /* HomeView.swift */; };
+		D1F637679320255865EE6263 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20243E690023D4C7E4C75A13 /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0AE6C171CD3CD7826061A37B /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
+		116AF927487E0D2528A13D22 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		20243E690023D4C7E4C75A13 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		38205E8225ABE3E289D31FCE /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		54CCA213BC9909E7BDD25DED /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumStyle.swift; sourceTree = "<group>"; };
+		7DBA31CE8BF567E7B225A935 /* PlumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumApp.swift; sourceTree = "<group>"; };
+		84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interfaces.swift; sourceTree = "<group>"; };
+		E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostView.swift; sourceTree = "<group>"; };
+		E74D5EA79E2D5804799F1BED /* Plum.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Plum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		07B01AD40D2A27FEDCD96B92 /* PlumDomain */ = {
+			isa = PBXGroup;
+			children = (
+				84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */,
+				20243E690023D4C7E4C75A13 /* Models.swift */,
+				2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */,
+			);
+			name = PlumDomain;
+			path = Sources/PlumDomain;
+			sourceTree = "<group>";
+		};
+		16A22207E28642215025A04E /* Create */ = {
+			isa = PBXGroup;
+			children = (
+				E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */,
+			);
+			path = Create;
+			sourceTree = "<group>";
+		};
+		4CC769EBE65B49FC51A61B93 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				116AF927487E0D2528A13D22 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		684B0D8E122C5E9DC3B95B9E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		688190F90C23D0E388F4EDD6 = {
+			isa = PBXGroup;
+			children = (
+				DB32E17E4BAB65CB7662D7ED /* PlumApp */,
+				07B01AD40D2A27FEDCD96B92 /* PlumDomain */,
+				FAFF14FCFA1F9D5F10205CF7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DB32E17E4BAB65CB7662D7ED /* PlumApp */ = {
+			isa = PBXGroup;
+			children = (
+				0AE6C171CD3CD7826061A37B /* ExploreView.swift */,
+				7DBA31CE8BF567E7B225A935 /* PlumApp.swift */,
+				38205E8225ABE3E289D31FCE /* ProfileView.swift */,
+				54CCA213BC9909E7BDD25DED /* RootTabView.swift */,
+				16A22207E28642215025A04E /* Create */,
+				4CC769EBE65B49FC51A61B93 /* Home */,
+				684B0D8E122C5E9DC3B95B9E /* Shared */,
+			);
+			path = PlumApp;
+			sourceTree = "<group>";
+		};
+		FAFF14FCFA1F9D5F10205CF7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E74D5EA79E2D5804799F1BED /* Plum.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B4271B2196446FEF122AF884 /* Plum */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AFE5AC1314A8D00A0F2C48EA /* Build configuration list for PBXNativeTarget "Plum" */;
+			buildPhases = (
+				58C2019EA4C1985FDE222E9A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Plum;
+			packageProductDependencies = (
+			);
+			productName = Plum;
+			productReference = E74D5EA79E2D5804799F1BED /* Plum.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F3896ED7D93380E10DE0F834 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 2C5E787E1AD51D15B546B8CC /* Build configuration list for PBXProject "Plum" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 688190F90C23D0E388F4EDD6;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FAFF14FCFA1F9D5F10205CF7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B4271B2196446FEF122AF884 /* Plum */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		58C2019EA4C1985FDE222E9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8624863B5B4310927D954018 /* CreatePostView.swift in Sources */,
+				04E6BC26AF31BCDDD3D9C9EB /* ExploreView.swift in Sources */,
+				AA410463365A322ED218D223 /* HomeView.swift in Sources */,
+				4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */,
+				D1F637679320255865EE6263 /* Models.swift in Sources */,
+				432036CE95704620218CF616 /* PlumApp.swift in Sources */,
+				82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */,
+				5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */,
+				22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */,
+				755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0783ACDDC6E0F4B0ACDA60C9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		28E0C114521A09BCBF66A0E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.plum.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8D6BFC237D21ED1FD89B3E51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		BF5E460A4C41E1F2CB1D8D49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.plum.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2C5E787E1AD51D15B546B8CC /* Build configuration list for PBXProject "Plum" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D6BFC237D21ED1FD89B3E51 /* Debug */,
+				0783ACDDC6E0F4B0ACDA60C9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AFE5AC1314A8D00A0F2C48EA /* Build configuration list for PBXNativeTarget "Plum" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF5E460A4C41E1F2CB1D8D49 /* Debug */,
+				28E0C114521A09BCBF66A0E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F3896ED7D93380E10DE0F834 /* Project object */;
+}
