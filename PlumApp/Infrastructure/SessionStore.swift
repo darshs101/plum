@@ -1,5 +1,6 @@
 import Foundation
 import Supabase
+import AuthenticationServices
 
 @MainActor final class SessionStore: ObservableObject {
     enum State { case loading, signedOut, signedIn, failed(String) }
@@ -13,4 +14,12 @@ import Supabase
     func signIn(email: String, password: String) async throws { guard let client else { throw SocialClientError.notConfigured }; try await client.auth.signIn(email: email, password: password); state = .signedIn }
     func signUp(email: String, password: String, username: String) async throws { guard let client else { throw SocialClientError.notConfigured }; _ = try await client.auth.signUp(email: email, password: password, data: ["username": .string(username)]); state = .signedIn }
     func signOut() async { guard let client else { return }; try? await client.auth.signOut(); state = .signedOut }
+    func signInWithGoogle() async throws {
+        guard let client else { throw SocialClientError.notConfigured }
+        let redirect = URL(string: "plum://login-callback")!
+        _ = try await client.auth.signInWithOAuth(provider: .google, redirectTo: redirect) { session in
+            session.prefersEphemeralWebBrowserSession = false
+        }
+        state = .signedIn
+    }
 }

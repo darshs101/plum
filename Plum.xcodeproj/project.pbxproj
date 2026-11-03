@@ -50,6 +50,7 @@
 		DE7FC07989484F580A73DD56 /* SupabaseConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfiguration.swift; sourceTree = "<group>"; };
 		E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostView.swift; sourceTree = "<group>"; };
 		E74D5EA79E2D5804799F1BED /* Plum.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Plum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE69B39D1A4B5884326E28D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				0AE6C171CD3CD7826061A37B /* ExploreView.swift */,
+				EE69B39D1A4B5884326E28D7 /* Info.plist */,
 				7DBA31CE8BF567E7B225A935 /* PlumApp.swift */,
 				38205E8225ABE3E289D31FCE /* ProfileView.swift */,
 				54CCA213BC9909E7BDD25DED /* RootTabView.swift */,
@@ -327,8 +329,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PlumApp/Info.plist;
 				INFOPLIST_KEY_SUPABASE_PUBLISHABLE_KEY = "$(SUPABASE_PUBLISHABLE_KEY)";
 				INFOPLIST_KEY_SUPABASE_URL = "$(SUPABASE_URL)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -413,8 +415,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Plum;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PlumApp/Info.plist;
 				INFOPLIST_KEY_SUPABASE_PUBLISHABLE_KEY = "$(SUPABASE_PUBLISHABLE_KEY)";
 				INFOPLIST_KEY_SUPABASE_URL = "$(SUPABASE_URL)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
