@@ -63,6 +63,8 @@ Optional fields:
 
 A post is displayed as an Instagram-style photo slideshow. Ratings are per dish; there is no required or separate restaurant rating. Users can edit a post. They may modify its restaurant, dish, ratings, photos, caption, and date, provided the post continues to satisfy the required fields. Removing or editing one dish preserves the rest of a multi-dish post. Deleting the entire post removes it and its ratings from aggregates, but does not remove any manually saved collection links.
 
+When a visit date is supplied, display it as the post's date, with no separate “Visited” label. Otherwise display the creation date.
+
 ## Ratings and public aggregates
 
 - Rating scale: optional only in the sense that there is no restaurant rating; every reviewed dish must have a 0.5–5.0 star rating.
@@ -96,6 +98,8 @@ Profile pages include:
 - A chronological visual grid of reviews/posts
 - Public collections
 - Rankings (ranked collections)
+
+Directly below the profile counts, show two icon-only content tabs: a waffle grid for the diary and a bookmark for collections/rankings. Do not show a Photo diary heading. The diary retains its thumbnail grid; tapping a thumbnail opens that post in a vertically scrollable sequence of that author's visible posts. Both owners and authorized viewers can scroll to newer/older entries, with pagination and the existing post actions preserved. The bookmark tab retains collection cards and the owner's create-collection action.
 
 Favorite cuisines, favorite neighborhoods, and a fixed all-time leaderboard are not separate v1 features. A user may make an unrestricted ranked collection to serve as an all-time leaderboard.
 

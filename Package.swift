@@ -7,5 +7,8 @@ let package = Package(
     products: [
         .library(name: "PlumDomain", targets: ["PlumDomain"])
     ],
-    targets: [.target(name: "PlumDomain")]
+    targets: [
+        .target(name: "PlumDomain"),
+        .testTarget(name: "PlumDomainTests", dependencies: ["PlumDomain"], path: "Tests/PlumDomainTests")
+    ]
 )

@@ -4,7 +4,8 @@ struct ProfileView: View { var body: some View { NavigationStack { MemberProfile
 struct MemberProfileView: View {
     let id: UUID?
     var notificationIdentity: LiveProfile? = nil
-    @EnvironmentObject private var session: SessionStore
+    private enum ContentTab { case diary, collections }
+    @State private var contentTab: ContentTab = .diary
     @State private var profile: LiveProfile?
     @State private var posts: [LivePost] = []
     @State private var collections: [LiveCollection] = []
@@ -30,26 +31,25 @@ struct MemberProfileView: View {
                 if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
                 if let profile {
                     profileHeader(profile)
-                    if !isOwner {
-                        HStack {
-                            Button(relationship == nil ? "Follow" : relationship == "requested" ? "Cancel request" : "Unfollow") { perform {
-                                guard let me else { return }
-                                if relationship == nil { try await PlumAPI.follow(profile.id, status: profile.visibility == "private" ? "requested" : "approved") }
-                                else { try await PlumAPI.unfollow(follower: me, following: profile.id) }; await load()
-                            } }.buttonStyle(.bordered).disabled(working)
-                            if isMutual { NavigationLink("Message") { ConversationView(otherUser: profile.id, otherName: profile.display_name) } }
-                            Button("Report") { reporting = true }
-                        }
-                    }
                     if canViewContent {
-                    Text("PHOTO DIARY").font(.caption.bold()).foregroundStyle(.plum)
-                    if posts.isEmpty { Text("No tastings yet.").foregroundStyle(.secondary) }
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 3), spacing: 5) {
-                        ForEach(posts) { post in NavigationLink { PostDetailView(id: post.id) } label: { AsyncImage(url: post.post_photos.first?.url) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.12) }.frame(height: 115).clipped().plumPhotoEdge().accessibilityLabel(post.restaurants?.name ?? "Open tasting") } }
-                    }
-                    if canLoadMore { Button("Load more tastings") { perform { let more = try await PlumAPI.posts(author: profile.id, offset: posts.count); posts += more; canLoadMore = more.count == 30 } } }
-                    HStack { Text("COLLECTIONS & RANKINGS").font(.caption.bold()).foregroundStyle(.plum); Spacer(); if isOwner { Button { newCollection = true } label: { Image(systemName: "plus.circle") }.accessibilityLabel("Create collection") } }
-                    ForEach(collections) { collection in NavigationLink { CollectionDetailView(id: collection.id) } label: { HStack { Image(systemName: collection.kind == "ranked" ? "list.number" : "bookmark"); Text(collection.title); Spacer(); if !collection.is_public { Image(systemName: "lock") } }.padding(14).background(.white, in: RoundedRectangle(cornerRadius: 14)) } }
+                        if contentTab == .diary {
+                            if posts.isEmpty { Text("No tastings yet.").foregroundStyle(.secondary) }
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 3), spacing: 5) {
+                                ForEach(posts) { post in NavigationLink {
+                                    ProfileDiaryView(authorID: profile.id, name: profile.username, initialPosts: posts, selectedPostID: post.id, hasMore: canLoadMore)
+                                } label: {
+                                    GeometryReader { geometry in
+                                        AsyncImage(url: post.post_photos.first?.url) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.12) }
+                                            .frame(width: geometry.size.width, height: geometry.size.height).clipped().plumPhotoEdge()
+                                    }.frame(height: 115).accessibilityLabel(post.restaurants?.name ?? "Open tasting")
+                                }.accessibilityIdentifier("profile.post.\(post.id.uuidString)") }
+                            }
+                            if canLoadMore { Button("Load more tastings") { perform { let more = try await PlumAPI.posts(author: profile.id, offset: posts.count); posts += more; canLoadMore = more.count == 30 } } }
+                        } else {
+                            if isOwner { HStack { Spacer(); Button { newCollection = true } label: { Image(systemName: "plus.circle") }.accessibilityLabel("Create collection") } }
+                            if collections.isEmpty { Text("No collections yet.").foregroundStyle(.secondary) }
+                            ForEach(collections) { collection in NavigationLink { CollectionDetailView(id: collection.id) } label: { HStack { Image(systemName: collection.kind == "ranked" ? "list.number" : "bookmark"); Text(collection.title); Spacer(); if !collection.is_public { Image(systemName: "lock") } }.padding(14).background(.white, in: RoundedRectangle(cornerRadius: 14)) } }
+                        }
                     } else { Text("Only approved followers can view this private profile’s posts and collections.").foregroundStyle(.secondary) }
 
                 }
@@ -69,8 +69,37 @@ struct MemberProfileView: View {
             Text(p.display_name).font(.title.bold()); Text("@\(p.username)").foregroundStyle(.secondary)
             if let city = p.city { Text(city).font(.subheadline) }
             if p.visibility == "private" { Label("Private account", systemImage: "lock").font(.caption) }
-            if canViewContent { HStack { Text("\(postCount) posts"); Spacer(); Text("\(followers) followers"); Spacer(); Text("\(following) following") }.font(.caption) }
+            if !isOwner {
+                HStack {
+                    Button(relationship == nil ? "Follow" : relationship == "requested" ? "Cancel request" : "Unfollow") { perform {
+                        guard let me else { return }
+                        if relationship == nil { try await PlumAPI.follow(p.id, status: p.visibility == "private" ? "requested" : "approved") }
+                        else { try await PlumAPI.unfollow(follower: me, following: p.id) }; await load()
+                    } }.buttonStyle(.bordered).disabled(working)
+                    if isMutual { NavigationLink("Message") { ConversationView(otherUser: p.id, otherName: p.display_name) } }
+                    Button("Report") { reporting = true }
+                }
+            }
+            if canViewContent {
+                VStack(spacing: 12) {
+                    HStack { Text("\(postCount) posts"); Spacer(); Text("\(followers) followers"); Spacer(); Text("\(following) following") }.font(.caption)
+                    HStack(spacing: 0) {
+                        contentTabButton(.diary, symbol: "square.grid.3x3", label: "Diary", identifier: "profile.diaryTab")
+                        contentTabButton(.collections, symbol: "bookmark", label: "Collections and rankings", identifier: "profile.collectionsTab")
+                    }
+                }
+            }
         }.frame(maxWidth: .infinity)
+    }
+    private func contentTabButton(_ tab: ContentTab, symbol: String, label: String, identifier: String) -> some View {
+        Button { contentTab = tab } label: {
+            Image(systemName: symbol).symbolVariant(.none).font(.title3.weight(.medium))
+                .foregroundStyle(contentTab == tab ? Color.plum : Color.secondary)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+                .overlay(alignment: .bottom) { Rectangle().fill(contentTab == tab ? Color.plum : .clear).frame(height: 2) }
+        }.buttonStyle(.plain).accessibilityLabel(label).accessibilityIdentifier(identifier)
+            .accessibilityAddTraits(contentTab == tab ? .isSelected : [])
     }
     private func perform(_ operation: @escaping @MainActor () async throws -> Void) { working = true; error = nil; Task { defer { working = false }; do { try await operation() } catch { self.error = error.localizedDescription } } }
     private func load() async {

@@ -29,6 +29,7 @@
 		82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */; };
 		8624863B5B4310927D954018 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */; };
 		87C46B36D9CA3C905CC88B4B /* ProfileAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2859B9FDCA76E74ECC8F0A7 /* ProfileAvatar.swift */; };
+		8B5D72EAD5C4A0DBCF455EDD /* PostCalendarDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323F34E4779742AD6E49EC5B /* PostCalendarDate.swift */; };
 		98DEE50B210EAFE83BE74736 /* AddRestaurantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1122C69533EC3DF3D6C7A75 /* AddRestaurantView.swift */; };
 		9F4619781F544DEEA019B4AC /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239080F928F533C99B1F1942 /* AppNavigation.swift */; };
 		A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31EFD115951F898BD54F1A /* SocialActionsView.swift */; };
@@ -40,6 +41,7 @@
 		D1F637679320255865EE6263 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20243E690023D4C7E4C75A13 /* Models.swift */; };
 		D8592E5F9146239C4F70B369 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E30C557FB2CB6BEC8DA25574 /* Supabase */; };
 		E91BECD85E38ABC3F9B1E853 /* PlumFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2970D1DB92C3B3B480E2E6 /* PlumFlowTests.swift */; };
+		F575B1A27AA8B6B4B8E684B6 /* ProfileDiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D07D12E3F56D9625961D40 /* ProfileDiaryView.swift */; };
 		FCF38722A405CBA6E339C72F /* DirectoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75B1EB341730705655281E3 /* DirectoryDetailView.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +65,7 @@
 		26E78E8DD8D6C5D9990F01E3 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		2F0108408EDCBBEF132B4ED7 /* PlumServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumServices.swift; sourceTree = "<group>"; };
 		2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		323F34E4779742AD6E49EC5B /* PostCalendarDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCalendarDate.swift; sourceTree = "<group>"; };
 		32B2E6C7727056ACC52A35B3 /* PlumUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PlumUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		35639BC7C03D0562A70B24FF /* LiveData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveData.swift; sourceTree = "<group>"; };
 		38205E8225ABE3E289D31FCE /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -71,6 +74,7 @@
 		6EAAA2D4134E9DB025A6ADCB /* SocialClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialClient.swift; sourceTree = "<group>"; };
 		6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumStyle.swift; sourceTree = "<group>"; };
 		716EAF48E616FD6735084E60 /* NotificationRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRegistration.swift; sourceTree = "<group>"; };
+		74D07D12E3F56D9625961D40 /* ProfileDiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDiaryView.swift; sourceTree = "<group>"; };
 		7A2970D1DB92C3B3B480E2E6 /* PlumFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumFlowTests.swift; sourceTree = "<group>"; };
 		7DBA31CE8BF567E7B225A935 /* PlumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumApp.swift; sourceTree = "<group>"; };
 		7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryServices.swift; sourceTree = "<group>"; };
@@ -112,6 +116,7 @@
 			children = (
 				84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */,
 				20243E690023D4C7E4C75A13 /* Models.swift */,
+				323F34E4779742AD6E49EC5B /* PostCalendarDate.swift */,
 				2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */,
 			);
 			name = PlumDomain;
@@ -219,6 +224,7 @@
 				0AE6C171CD3CD7826061A37B /* ExploreView.swift */,
 				EE69B39D1A4B5884326E28D7 /* Info.plist */,
 				7DBA31CE8BF567E7B225A935 /* PlumApp.swift */,
+				74D07D12E3F56D9625961D40 /* ProfileDiaryView.swift */,
 				B9E6C5E2EB3B295A353CC2FB /* ProfileSettingsView.swift */,
 				38205E8225ABE3E289D31FCE /* ProfileView.swift */,
 				54CCA213BC9909E7BDD25DED /* RootTabView.swift */,
@@ -362,8 +368,10 @@
 				432036CE95704620218CF616 /* PlumApp.swift in Sources */,
 				4502BC6A743D196EF0A7D33C /* PlumServices.swift in Sources */,
 				82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */,
+				8B5D72EAD5C4A0DBCF455EDD /* PostCalendarDate.swift in Sources */,
 				57939EC433EB83114D21E7AB /* PostDetailView.swift in Sources */,
 				87C46B36D9CA3C905CC88B4B /* ProfileAvatar.swift in Sources */,
+				F575B1A27AA8B6B4B8E684B6 /* ProfileDiaryView.swift in Sources */,
 				763712ADE4DD47991EA9AABD /* ProfileSettingsView.swift in Sources */,
 				5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */,
 				22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */,

@@ -17,6 +17,9 @@ struct LivePost: Codable, Identifiable, Sendable {
     let id: UUID; let author_id: UUID; let restaurant_id: UUID; var caption: String?; let visit_date: String?; let created_at: Date
     let profiles: LiveProfile?; let restaurants: PlaceLabel?; var post_dishes: [LiveRating]; var post_photos: [LivePhoto]
     struct PlaceLabel: Codable, Sendable { let name: String; let neighborhood: String? }
+    var displayDate: Date {
+        visit_date.flatMap { PostCalendarDate.date(from: $0) } ?? created_at
+    }
 }
 struct LiveCollection: Codable, Identifiable, Sendable { let id: UUID; let owner_id: UUID; var title: String; var kind: String; var is_public: Bool }
 struct LiveCollectionItem: Codable, Identifiable, Sendable {
@@ -60,7 +63,7 @@ enum PlumAPI {
             guard !follows.isEmpty else { return [] }
             query = query.in("author_id", values: follows.map(\.following_id))
         }
-        let rows: [LivePost] = try await query.order("created_at", ascending: false).range(from: offset, to: offset + 29).execute().value
+        let rows: [LivePost] = try await query.order("created_at", ascending: false).order("id", ascending: false).range(from: offset, to: offset + 29).execute().value
         return try await hydrate(rows)
     }
     static func publicPosts(restaurant: UUID, dish: UUID? = nil) async throws -> [LivePost] {

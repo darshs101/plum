@@ -25,8 +25,7 @@ struct EditPostView: View {
         self.post = post
         _caption = State(initialValue: post.caption ?? ""); _ratings = State(initialValue: post.post_dishes); _photos = State(initialValue: post.post_photos); _restaurantID = State(initialValue: post.restaurant_id)
         _includesDate = State(initialValue: post.visit_date != nil)
-        let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
-        _date = State(initialValue: post.visit_date.flatMap(formatter.date(from:)) ?? .now)
+        _date = State(initialValue: post.visit_date.flatMap { PostCalendarDate.date(from: $0) } ?? .now)
     }
     var body: some View {
         NavigationStack { Form {
@@ -66,14 +65,13 @@ struct EditPostView: View {
                 try await PlumAPI.client.storage.from("post-media").upload(path, data: jpeg, options: .init(contentType: "image/jpeg")); uploaded.append(path)
                 try await PlumAPI.client.storage.from("post-media").upload(path + ".original", data: data, options: .init(contentType: item.supportedContentTypes.first?.preferredMIMEType ?? "application/octet-stream"))
             }
-            let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
             let entries = ratings.map { SavePostDish(dish_id: $0.dish_id, rating: $0.rating) } + added
             let paths = photos.map(\.storage_path) + uploaded
             // Existing photos may be associated with every remaining dish; new photos
             // initially illustrate all dishes. This preserves the multi-dish invariant
             // without silently dropping a photo when a dish is edited.
             let links = paths.map { SavePostPhotoLink(photo_path: $0, dish_ids: entries.map(\.dish_id)) }
-            _ = try await PlumAPI.client.rpc("save_post", params: SavePostParams(post_uuid: post.id, restaurant_uuid: restaurantID, dish_entries: entries, photo_paths: paths, caption_text: caption.isEmpty ? nil : caption, visited_on: includesDate ? formatter.string(from: date) : nil, photo_links: links)).execute(); dismiss()
+            _ = try await PlumAPI.client.rpc("save_post", params: SavePostParams(post_uuid: post.id, restaurant_uuid: restaurantID, dish_entries: entries, photo_paths: paths, caption_text: caption.isEmpty ? nil : caption, visited_on: includesDate ? PostCalendarDate.string(from: date) : nil, photo_links: links)).execute(); dismiss()
         } catch { if !uploaded.isEmpty { _ = try? await PlumAPI.client.storage.from("post-media").remove(paths: uploaded + uploaded.map { $0 + ".original" }) }; self.error = error.localizedDescription }
     }
 

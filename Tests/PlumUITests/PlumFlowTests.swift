@@ -56,6 +56,7 @@ final class PlumFlowTests: XCTestCase {
         app.tabBars.buttons.element(boundBy: 4).tap()
         XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 15), app.debugDescription)
         XCTAssertTrue(app.staticTexts["Private account"].exists)
+        app.buttons["profile.collectionsTab"].tap()
         let saved = app.buttons["Saved Places"]
         if !saved.exists { app.swipeUp() }
         XCTAssertTrue(saved.waitForExistence(timeout: 5), app.debugDescription)
@@ -184,6 +185,7 @@ final class PlumFlowTests: XCTestCase {
         save.tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 15), app.debugDescription)
         app.navigationBars.buttons["Profile"].tap()
+        app.buttons["profile.collectionsTab"].tap()
         let collection = app.buttons["Social QA rankings"]
         for _ in 0..<4 { if collection.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(collection.waitForExistence(timeout: 8), app.debugDescription); collection.tap()
@@ -196,6 +198,64 @@ final class PlumFlowTests: XCTestCase {
         app.tabBars.buttons.element(boundBy: 4).tap()
         XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 10))
         attach(app, name: "Profile photo after relaunch")
+    }
+    @MainActor func testProfileIconTabsDatesAndScrollableDiary() throws {
+        continueAfterFailure = false
+        let bundle = Bundle(for: Self.self)
+        let selected = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_DIARY_SELECTED_POST") as? String)
+        let selectedID = try XCTUnwrap(UUID(uuidString: selected)).uuidString
+        let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(app.buttons["profile.diaryTab"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["profile.collectionsTab"].exists)
+        XCTAssertFalse(app.staticTexts["PHOTO DIARY"].exists)
+        XCTAssertFalse(app.buttons["Saved Places"].exists)
+        app.buttons["profile.collectionsTab"].tap()
+        XCTAssertTrue(app.buttons["Saved Places"].waitForExistence(timeout: 8))
+        app.buttons["profile.diaryTab"].tap()
+        let thumbnail = app.buttons["profile.post." + selectedID]
+        XCTAssertTrue(thumbnail.waitForExistence(timeout: 10), app.debugDescription); thumbnail.tap()
+        XCTAssertTrue(app.staticTexts["Diary QA entry 31"].waitForExistence(timeout: 10), app.debugDescription)
+        attach(app, name: "Diary initial tapped position")
+        XCTAssertTrue(app.staticTexts["Diary QA entry 31"].isHittable, "The tapped post should be the initial visible post: \(app.debugDescription)")
+        let date = app.staticTexts["post.date." + selectedID]
+        XCTAssertTrue(date.waitForExistence(timeout: 8), app.debugDescription)
+        XCTAssertTrue(date.label.contains("2020"), date.label)
+        XCTAssertFalse(date.label.contains("Visited"), date.label)
+        attach(app, name: "Selected diary post uses visit date as post date")
+        let newer = app.staticTexts["Diary QA entry 32"]
+        for _ in 0..<6 { if newer.isHittable { break }; app.swipeDown() }
+        XCTAssertTrue(newer.isHittable, "Scroll up should reveal a newer post")
+        let oldest = app.staticTexts["Diary QA entry 01"]
+        for _ in 0..<60 { if oldest.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(oldest.isHittable, "Scrolling should load beyond the first 30 posts")
+        attach(app, name: "Diary pagination reaches older posts")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        try signOutFromProfile(app)
+        app.buttons["Already have an account? Sign in"].tap()
+        let email = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_SECOND_EMAIL") as? String)
+        let password = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_PASSWORD") as? String)
+        app.textFields["auth.email"].tap(); app.textFields["auth.email"].typeText(email)
+        app.secureTextFields["auth.password"].tap(); app.secureTextFields["auth.password"].typeText(password)
+        app.buttons["auth.submit"].tap()
+        if app.buttons["Not Now"].waitForExistence(timeout: 3) { app.buttons["Not Now"].tap() }
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 0).tap()
+        let owner = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_OWNER_NAME") as? String)
+        let ownerLink = app.buttons["@" + owner].firstMatch
+        XCTAssertTrue(ownerLink.waitForExistence(timeout: 15), app.debugDescription); ownerLink.tap()
+        XCTAssertTrue(app.buttons["profile.diaryTab"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["profile.settings"].exists)
+        let otherThumbnail = app.buttons["profile.post." + selectedID]
+        XCTAssertTrue(otherThumbnail.waitForExistence(timeout: 10)); otherThumbnail.tap()
+        XCTAssertTrue(app.staticTexts["Diary QA entry 31"].waitForExistence(timeout: 10))
+        let next = app.staticTexts["Diary QA entry 30"]
+        for _ in 0..<5 { if next.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(next.isHittable, "Approved viewers can scroll another user's diary")
+        attach(app, name: "Approved follower scrolls another profile diary")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        try signOutFromProfile(app)
     }
     @MainActor func testMessagesPicturesAndChronologicalRows() throws {
         continueAfterFailure = false

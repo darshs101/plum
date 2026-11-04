@@ -104,7 +104,7 @@ actor SupabaseDirectoryService: DirectoryServing {
             }
             let params = SavePostParams(post_uuid: postID, restaurant_uuid: draft.restaurantID,
                 dish_entries: draft.dishes.map { .init(dish_id: $0.dishID!, rating: $0.rating) },
-                photo_paths: paths, caption_text: draft.caption, visited_on: draft.visitDate.map { ISO8601DateFormatter().string(from: $0).prefix(10).description },
+                photo_paths: paths, caption_text: draft.caption, visited_on: draft.visitDate.map { PostCalendarDate.string(from: $0) },
                 photo_links: zip(paths, draft.photos).map { .init(photo_path: $0.0, dish_ids: Array($0.1.linkedDishIDs)) })
             _ = try await client.rpc("save_post", params: params).execute()
         } catch { if !paths.isEmpty { _ = try? await client.storage.from("post-media").remove(paths: paths + originalPaths) }; throw error }

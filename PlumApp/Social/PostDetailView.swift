@@ -2,6 +2,9 @@ import SwiftUI
 
 struct PostDetailView: View {
     let id: UUID
+    var embedded = false
+    var onDeleted: (() -> Void)? = nil
+    private var reloadToken = 0
     @Environment(\.dismiss) private var dismiss
     @State private var post: LivePost?
     @State private var comments: [LiveComment] = []
@@ -19,10 +22,21 @@ struct PostDetailView: View {
     @State private var sharing = false
     @State private var deleting = false
     @State private var reportedPhoto: LivePhoto?
-    var body: some View {
-        ScrollView {
+    init(id: UUID, embedded: Bool = false, onDeleted: (() -> Void)? = nil, initialPost: LivePost? = nil, reloadToken: Int = 0) {
+        self.id = id; self.embedded = embedded; self.onDeleted = onDeleted
+        self.reloadToken = reloadToken
+        _post = State(initialValue: initialPost)
+        _loading = State(initialValue: initialPost == nil)
+    }
+    @ViewBuilder var body: some View {
+        if embedded { content }
+        else {
+            ScrollView { content }.navigationTitle("Tasting").navigationBarTitleDisplayMode(.inline).refreshable { await load() }
+        }
+    }
+    private var content: some View {
             VStack(alignment: .leading, spacing: 18) {
-                if loading { ProgressView("Loading post…") }
+                if loading && post == nil { ProgressView("Loading post…") }
                 if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
                 if let post {
                     LivePostContent(post: post)
@@ -50,13 +64,13 @@ struct PostDetailView: View {
                     } }.accessibilityIdentifier("post.sendComment").disabled(working || bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }.padding(18)
-        }.navigationTitle("Tasting").navigationBarTitleDisplayMode(.inline).task { await load() }.refreshable { await load() }
+            .task(id: reloadToken) { await load() }
             .sheet(item: $reportedPhoto) { photo in ReportContentView(type: "photo", id: photo.id) }
             .sheet(isPresented: $reporting) { ReportContentView(type: "post", id: id) }
             .sheet(isPresented: $saving) { AddToCollectionView(postID: id) }
             .sheet(isPresented: $sharing) { SharePostView(postID: id) }
             .sheet(isPresented: $editing, onDismiss: { Task { await load() } }) { if let post { EditPostView(post: post) } }
-            .confirmationDialog("Delete this post and its ratings?", isPresented: $deleting) { Button("Delete post", role: .destructive) { action { try await PlumAPI.removePost(id); dismiss() } } }
+            .confirmationDialog("Delete this post and its ratings?", isPresented: $deleting) { Button("Delete post", role: .destructive) { action { try await PlumAPI.removePost(id); if let onDeleted { onDeleted() } else { dismiss() } } } }
     }
     private func commentRow(_ comment: LiveComment, post: LivePost) -> some View {
         VStack(alignment: .leading, spacing: 6) {

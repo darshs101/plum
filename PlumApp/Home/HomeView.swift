@@ -44,8 +44,7 @@ struct LivePostContent: View {
             Text(post.restaurants?.name ?? "Restaurant").font(.headline)
             ForEach(post.post_dishes) { dish in HStack { Text(dish.dishes?.name ?? "Dish"); Spacer(); Label(dish.rating.formatted(), systemImage: "star.fill") } }
             if let caption = post.caption, !caption.isEmpty { Text(caption) }
-            if let visitDate = post.visit_date { Text("Visited \(visitDate)").font(.caption).foregroundStyle(.secondary) }
-            else { Text(post.created_at, style: .date).font(.caption).foregroundStyle(.secondary) }
+            Text(post.displayDate, style: .date).font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("post.date.\(post.id.uuidString)")
         }
     }
 }
