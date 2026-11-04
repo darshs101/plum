@@ -116,7 +116,7 @@ private struct ResultRow: View {
             Image(systemName: symbol).font(.title3).foregroundStyle(.plum).frame(width: 58, height: 58).background(Color.plum.opacity(0.1), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             VStack(alignment: .leading, spacing: 4) { Text(result.title).font(.headline).foregroundStyle(.plum); Text(result.subtitle).font(.subheadline).foregroundStyle(.plum.opacity(0.65)); if result.isExactMatch { Text("Exact match").font(.caption2.weight(.bold)).foregroundStyle(.plum) } }
             Spacer()
-        }.padding(10).background(.white.opacity(0.56), in: RoundedRectangle(cornerRadius: 17, style: .continuous))
+        }.padding(10).background(.white.opacity(0.56), in: RoundedRectangle(cornerRadius: 23, style: .continuous))
     }
     private var symbol: String { switch result.kind { case .restaurant: "fork.knife"; case .dish: "star"; case .user: "person"; case .collection: "bookmark" } }
 }

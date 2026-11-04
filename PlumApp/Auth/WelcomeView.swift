@@ -19,6 +19,7 @@ struct WelcomeView: View {
                 if showEmail { emailForm } else { welcome }
             }
             .background(PlumStyle.cream.ignoresSafeArea())
+            .tint(.plum)
             .navigationTitle(showEmail ? (creatingAccount ? "Create account" : "Sign in") : "Plum")
             .alert("Couldn’t continue", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
         }
@@ -32,10 +33,10 @@ struct WelcomeView: View {
                 run { try await session.signInWithApple(result.get()) }
             }.signInWithAppleButtonStyle(.black).frame(height: 50).disabled(working)
             Button { run { try await session.signInWithGoogle() } } label: {
-                Label("Continue with Google", systemImage: "g.circle.fill").frame(maxWidth: .infinity)
-            }.buttonStyle(.bordered).tint(.plum).disabled(working)
-            Button("Create an account with email") { creatingAccount = true; showEmail = true }.frame(maxWidth: .infinity).disabled(working)
-            Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity).disabled(working)
+                Label("Continue with Google", systemImage: "g.circle").frame(maxWidth: .infinity)
+            }.buttonStyle(PlumActionStyle(emphasis: .secondary)).disabled(working)
+            Button("Create an account with email") { creatingAccount = true; showEmail = true }.buttonStyle(PlumActionStyle()).disabled(working)
+            Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity).foregroundStyle(.plum).disabled(working)
             if working { ProgressView("Signing in…").frame(maxWidth: .infinity) }
             Spacer()
         }.padding(24)

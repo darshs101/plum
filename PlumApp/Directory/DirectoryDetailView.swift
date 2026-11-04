@@ -20,7 +20,7 @@ struct DirectoryDetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
                 if let restaurant {
-                    AsyncImage(url: restaurant.photoURL) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.1) }.frame(height: 240).clipped().clipShape(RoundedRectangle(cornerRadius: 16))
+                    AsyncImage(url: restaurant.photoURL) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.1) }.frame(height: 240).clipped().clipShape(RoundedRectangle(cornerRadius: 16)).plumPhotoEdge(radius: 16)
                     Text(dishID.flatMap { id in dishes.first { $0.id == (resolvedDishID ?? id) }?.name } ?? restaurant.name).font(.largeTitle.bold())
                     Text(restaurant.address).foregroundStyle(.secondary)
                     if !restaurant.cuisine.isEmpty { Text("\(restaurant.cuisine) · \(restaurant.neighborhood) · \(String(repeating: "$", count: restaurant.priceLevel))").font(.subheadline) }

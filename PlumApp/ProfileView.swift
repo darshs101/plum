@@ -51,7 +51,7 @@ struct MemberProfileView: View {
                     Text("PHOTO DIARY").font(.caption.bold()).foregroundStyle(.plum)
                     if posts.isEmpty { Text("No tastings yet.").foregroundStyle(.secondary) }
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 3), spacing: 5) {
-                        ForEach(posts) { post in NavigationLink { PostDetailView(id: post.id) } label: { AsyncImage(url: post.post_photos.first?.url) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.12) }.frame(height: 115).clipped().accessibilityLabel(post.restaurants?.name ?? "Open tasting") } }
+                        ForEach(posts) { post in NavigationLink { PostDetailView(id: post.id) } label: { AsyncImage(url: post.post_photos.first?.url) { $0.resizable().scaledToFill() } placeholder: { Color.plum.opacity(0.12) }.frame(height: 115).clipped().plumPhotoEdge().accessibilityLabel(post.restaurants?.name ?? "Open tasting") } }
                     }
                     if canLoadMore { Button("Load more tastings") { perform { let more = try await PlumAPI.posts(author: profile.id, offset: posts.count); posts += more; canLoadMore = more.count == 30 } } }
                     HStack { Text("COLLECTIONS & RANKINGS").font(.caption.bold()).foregroundStyle(.plum); Spacer(); if isOwner { Button { newCollection = true } label: { Image(systemName: "plus.circle") }.accessibilityLabel("Create collection") } }

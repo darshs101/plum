@@ -149,8 +149,9 @@ struct CreatePostView: View {
             VStack(alignment: .leading, spacing: 12) {
                 PhotosPicker(selection: $pickerItems, maxSelectionCount: 8, matching: .images) {
                     HStack(spacing: 14) {
-                        Image(systemName: "photo.stack.fill")
+                        Image(systemName: "photo.stack")
                             .font(.title3)
+                            .foregroundStyle(.plum)
                             .frame(width: 42, height: 42)
                             .background(Color.plum.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
                         VStack(alignment: .leading, spacing: 3) {
@@ -165,7 +166,7 @@ struct CreatePostView: View {
                             .fontWeight(.bold)
                     }
                     .padding(14)
-                    .background(.background, in: RoundedRectangle(cornerRadius: PlumStyle.cornerRadius))
+                    .background(.background, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("composer.photoPicker")
@@ -175,7 +176,7 @@ struct CreatePostView: View {
                         HStack(spacing: 10) {
                             ForEach(store.photos) { photo in
                                 ZStack(alignment: .topTrailing) {
-                                    if let image = UIImage(data: photo.data) { Image(uiImage: image).resizable().scaledToFill().frame(width: 88, height: 88).clipShape(RoundedRectangle(cornerRadius: 10)) }
+                                    if let image = UIImage(data: photo.data) { Image(uiImage: image).resizable().scaledToFill().frame(width: 88, height: 88).clipShape(RoundedRectangle(cornerRadius: 10)).plumPhotoEdge(radius: 10) }
                                     Button { removePhoto(photo.id) } label: { Image(systemName: "xmark.circle.fill").symbolRenderingMode(.palette).foregroundStyle(.white, .plum).font(.title3) }.accessibilityLabel("Remove photo").accessibilityIdentifier("composer.removePhoto")
                                 }
                             }
@@ -216,11 +217,8 @@ struct CreatePostView: View {
             Group { if store.isWorking { ProgressView().tint(.white) } else { Text("Post tasting") } }
                 .font(.headline)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
         }
-        .buttonStyle(.plain)
-        .foregroundStyle(.white)
-        .background(canPost ? Color.plum : Color.gray.opacity(0.45), in: RoundedRectangle(cornerRadius: 14))
+        .buttonStyle(PlumActionStyle())
         .disabled(!canPost || store.isWorking)
         .accessibilityIdentifier("composer.publish")
         .accessibilityHint(canPost ? "Publishes your tasting" : "Choose a restaurant, add a dish, and attach a photo to post")
@@ -330,7 +328,7 @@ private struct DishEditor: View {
             }
         }
         .padding(14)
-        .background(.background, in: RoundedRectangle(cornerRadius: PlumStyle.cornerRadius))
+        .background(.background, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }
 

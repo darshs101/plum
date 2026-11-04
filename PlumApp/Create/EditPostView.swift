@@ -44,7 +44,7 @@ struct EditPostView: View {
                 Button(replacementTarget == nil ? "Add dish" : "Replace dish") { Task { await resolveAndAddDish() } }.disabled(newDish.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || working)
             }
             Section("Photos") {
-                ForEach(photos) { photo in HStack { AsyncImage(url: photo.url) { phase in switch phase { case .success(let image): image.resizable().scaledToFit(); case .failure: Label("Photo unavailable", systemImage: "exclamationmark.triangle").foregroundStyle(.secondary); default: ProgressView().frame(width: 90, height: 90) } }.frame(width: 120, height: 90); Spacer(); Button("Remove", role: .destructive) { photos.removeAll { $0.id == photo.id } }.accessibilityIdentifier("edit.removePhoto.\(photo.id.uuidString)") } }
+                ForEach(photos) { photo in HStack { AsyncImage(url: photo.url) { phase in switch phase { case .success(let image): image.resizable().scaledToFit(); case .failure: Label("Photo unavailable", systemImage: "exclamationmark.triangle").foregroundStyle(.secondary); default: ProgressView().frame(width: 90, height: 90) } }.frame(width: 120, height: 90).plumPhotoEdge(); Spacer(); Button("Remove", role: .destructive) { photos.removeAll { $0.id == photo.id } }.accessibilityIdentifier("edit.removePhoto.\(photo.id.uuidString)") } }
                 PhotosPicker(selection: $newPhotos, maxSelectionCount: 8, matching: .images) { Text("Add photos") }
             }
             Section("Details") { TextField("Caption", text: $caption, axis: .vertical).accessibilityIdentifier("edit.caption"); Toggle("Visit date", isOn: $includesDate); if includesDate { DatePicker("Date", selection: $date, in: ...Date(), displayedComponents: .date) } }

@@ -33,7 +33,7 @@ struct LivePostCard: View {
             NavigationLink { PostDetailView(id: post.id) } label: {
                 LivePostContent(post: post).foregroundStyle(.primary)
             }.buttonStyle(.plain)
-        }.padding(14).background(.white, in: RoundedRectangle(cornerRadius: 20))
+        }.padding(14).background(.white, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 }
 struct LivePostContent: View {
@@ -59,7 +59,7 @@ struct PostSlideshow: View {
                 else { Rectangle().fill(Color.plum.opacity(0.1)).overlay(ProgressView()) }
             }.clipped()
         } }
-            .tabViewStyle(.page(indexDisplayMode: photos.count > 1 ? .always : .never)).frame(height: 280).clipShape(RoundedRectangle(cornerRadius: 14))
+            .tabViewStyle(.page(indexDisplayMode: photos.count > 1 ? .always : .never)).frame(height: 280).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)).plumPhotoEdge(radius: 14)
     }
 }
 struct RetryState: View {
