@@ -22,6 +22,7 @@ struct MemberProfileView: View {
     @State private var reporting = false
     @State private var newCollection = false
     @State private var isAdmin = false
+    @ObservedObject private var notifications = NotificationInboxStore.shared
     private var canViewContent: Bool { isOwner || profile?.visibility == "public" || relationship == "approved" }
     private var isOwner: Bool { id == nil || id == me }
     var body: some View {
@@ -58,8 +59,21 @@ struct MemberProfileView: View {
             .background(PlumStyle.cream.ignoresSafeArea()).task { await load() }.refreshable { await load() }
             .toolbar { if isOwner {
                 ToolbarItem(placement: .topBarLeading) { if let profile { NavigationLink { ProfileSettingsView(profile: profile, isAdmin: isAdmin) { Task { await load() } } } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings").accessibilityIdentifier("profile.settings") } }
-                ToolbarItem(placement: .topBarTrailing) { NavigationLink { LiveNotificationsView() } label: { Image(systemName: "bell") }.accessibilityLabel("Notifications") }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink { LiveNotificationsView() } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell").frame(width: 32, height: 32)
+                            if notifications.unreadCount > 0 {
+                                Text("\(notifications.unreadCount)").font(.system(size: 10, weight: .bold)).monospacedDigit()
+                                    .foregroundStyle(.white).padding(.horizontal, 4).frame(minWidth: 18, minHeight: 18)
+                                    .background(.red, in: Capsule()).fixedSize().offset(x: 4, y: -3).accessibilityHidden(true)
+                            }
+                        }.frame(width: 36, height: 36)
+                    }.accessibilityLabel("Notifications").accessibilityIdentifier("profile.notifications")
+                        .accessibilityValue("\(notifications.unreadCount) unread notifications")
+                }
             } }
+            .onChange(of: notifications.revision) { _, _ in if isOwner { Task { try? await refreshConnections() } } }
             .sheet(isPresented: $newCollection, onDismiss: { Task { await load() } }) { NewCollectionView() }
             .sheet(isPresented: $reporting) { if let profile { ReportContentView(type: "account", id: profile.id) } }
     }
@@ -117,10 +131,16 @@ struct MemberProfileView: View {
             posts = try await PlumAPI.posts(author: target); canLoadMore = posts.count == 30
             postCount = try await PlumAPI.client.from("posts").select("id", head: true, count: .exact).eq("author_id", value: target).eq("is_removed", value: false).execute().count ?? 0
             collections = try await PlumAPI.collections(owner: target)
-            let incoming: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("following_id", value: target).execute().value
-            let outgoing: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("follower_id", value: target).eq("status", value: "approved").execute().value
-            followers = incoming.filter { $0.status == "approved" }.count; following = outgoing.count; relationship = incoming.first { $0.follower_id == me }?.status
-            isMutual = relationship == "approved" && outgoing.contains { $0.following_id == me }
+            try await refreshConnections()
         } catch { self.error = error.localizedDescription }
+    }
+    private func refreshConnections() async throws {
+        guard let profile else { return }
+        let current = try await PlumAPI.userID()
+        let incoming: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("following_id", value: profile.id).execute().value
+        let outgoing: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("follower_id", value: profile.id).eq("status", value: "approved").execute().value
+        followers = incoming.filter { $0.status == "approved" }.count; following = outgoing.count
+        relationship = incoming.first { $0.follower_id == current }?.status
+        isMutual = relationship == "approved" && outgoing.contains { $0.following_id == current }
     }
 }

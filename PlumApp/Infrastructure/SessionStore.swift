@@ -17,7 +17,7 @@ import Security
         authTask = Task { [weak self] in
             for await (event, _) in client.auth.authStateChanges {
                 guard !Task.isCancelled else { return }
-                if event == .signedOut || event == .userDeleted { self?.needsOnboarding = false; self?.state = .signedOut }
+                if event == .signedOut || event == .userDeleted { NotificationInboxStore.shared.reset(); self?.needsOnboarding = false; self?.state = .signedOut }
             }
         }
     }
@@ -113,6 +113,7 @@ import Security
         do { try await client.auth.signOut(scope: .local) }
         catch { /* The SDK clears local credentials before requesting remote revocation. */ }
         AppNavigation.shared.pendingNotification = nil
+        NotificationInboxStore.shared.reset()
         needsOnboarding = false; state = .signedOut
     }
     func signInWithGoogle() async throws {

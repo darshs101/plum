@@ -120,10 +120,10 @@ final class PlumFlowTests: XCTestCase {
         XCTAssertTrue(app.buttons["post.like"].waitForExistence(timeout: 10), app.debugDescription)
         app.buttons["post.like"].tap()
         app.swipeUp()
-        let comment = app.textFields["post.comment"]
+        let comment = app.textFields.matching(identifier: "post.comment").firstMatch
         XCTAssertTrue(comment.waitForExistence(timeout: 5), app.debugDescription)
         comment.tap(); comment.typeText("Simulator audit comment")
-        app.buttons["post.sendComment"].tap()
+        app.buttons.matching(identifier: "post.sendComment").firstMatch.tap()
         XCTAssertTrue(app.staticTexts["Simulator audit comment"].waitForExistence(timeout: 10), app.debugDescription)
         app.swipeDown()
         app.buttons["post.options"].tap(); app.buttons["Edit post"].tap()
@@ -254,6 +254,146 @@ final class PlumFlowTests: XCTestCase {
         for _ in 0..<5 { if next.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(next.isHittable, "Approved viewers can scroll another user's diary")
         attach(app, name: "Approved follower scrolls another profile diary")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        try signOutFromProfile(app)
+    }
+    @MainActor func testBellUnreadFollowBackAndMessageBubbles() async throws {
+        continueAfterFailure = false
+        let bundle = Bundle(for: Self.self)
+        func value(_ key: String) throws -> String { try XCTUnwrap(bundle.object(forInfoDictionaryKey: key) as? String) }
+        let follower = try XCTUnwrap(UUID(uuidString: try value("PLUM_QA_FOLLOWER_ID"))).uuidString
+        let post = try value("PLUM_QA_COMMENT_POST")
+        let sender = try await qaLogin(email: value("PLUM_QA_SECOND_EMAIL"))
+        let newFollower = try await qaLogin(email: value("PLUM_QA_FOLLOWER_EMAIL"))
+        let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        waitForBell(app, count: 0)
+        let meData = try await qaRequest("/auth/v1/user", token: sender, method: "GET")
+        let senderID = try XCTUnwrap((try JSONSerialization.jsonObject(with: meData) as? [String: Any])?["id"] as? String)
+        let ownerData = try await qaRequest("/auth/v1/token?grant_type=password", body: ["email":value("PLUM_QA_EMAIL"),"password":value("PLUM_QA_PASSWORD")])
+        let owner = try XCTUnwrap(try JSONSerialization.jsonObject(with: ownerData) as? [String: Any])
+        let ownerID = try XCTUnwrap((owner["user"] as? [String: Any])?["id"] as? String)
+        _ = try await qaRequest("/rest/v1/follows", token: newFollower, body: ["follower_id":follower.lowercased(),"following_id":ownerID,"status":"requested"])
+        waitForBell(app, count: 1)
+        attach(app, name: "One new notification on bell")
+        _ = try await qaRequest("/rest/v1/rpc/mark_notifications_viewed", token: sender)
+        waitForBell(app, count: 1)
+        _ = try await qaRequest("/rest/v1/likes", token: sender, body: ["post_id":post,"user_id":senderID])
+        waitForBell(app, count: 2)
+        app.buttons["profile.notifications"].tap()
+        let confirm = app.buttons["Confirm"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10), app.debugDescription); confirm.tap()
+        let followBack = app.buttons["notification.followBack." + follower]
+        XCTAssertTrue(followBack.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(followBack.label.contains("Follow back")); followBack.tap()
+        waitForLabel(followBack, label: "Following")
+        attach(app, name: "Follow back inline in notification")
+        app.navigationBars.buttons["Profile"].tap()
+        waitForBell(app, count: 0)
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15)); app.tabBars.buttons.element(boundBy: 4).tap()
+        waitForBell(app, count: 0)
+        _ = try await qaRequest("/rest/v1/comments", token: sender, body: ["post_id":post,"author_id":senderID,"body":"Badge QA update after checking"])
+        waitForBell(app, count: 1)
+        app.buttons["profile.notifications"].tap()
+        XCTAssertTrue(app.navigationBars["Notifications"].waitForExistence(timeout: 10)); app.navigationBars.buttons["Profile"].tap()
+        waitForBell(app, count: 0)
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        let friend = try value("PLUM_QA_CHAT_FRIEND_NAME")
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", friend)).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 12), app.debugDescription); row.tap()
+        let sent = app.staticTexts[try value("PLUM_QA_SENT_TEXT")]
+        let received = app.staticTexts[try value("PLUM_QA_RECEIVED_TEXT")]
+        XCTAssertTrue(sent.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(received.exists)
+        XCTAssertGreaterThan(sent.frame.midX, received.frame.midX)
+        XCTAssertEqual(sent.value as? String, "Sent"); XCTAssertEqual(received.value as? String, "Received")
+        attach(app, name: "Purple outgoing right and gray incoming left")
+        app.navigationBars.buttons["Messages"].tap()
+        try signOutFromProfile(app)
+    }
+    @MainActor private func waitForBell(_ app: XCUIApplication, count: Int) {
+        let bell = app.buttons["profile.notifications"]
+        XCTAssertTrue(bell.waitForExistence(timeout: 12), app.debugDescription)
+        expectation(for: NSPredicate(format: "value == %@", "\(count) unread notifications"), evaluatedWith: bell)
+        waitForExpectations(timeout: 12)
+    }
+    @MainActor private func waitForLabel(_ element: XCUIElement, label: String) {
+        expectation(for: NSPredicate(format: "label == %@", label), evaluatedWith: element)
+        waitForExpectations(timeout: 12)
+    }
+    @MainActor private func qaRequest(_ path: String, token: String? = nil, method: String = "POST", body: [String: String] = [:]) async throws -> Data {
+        let bundle = Bundle(for: Self.self)
+        let base = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_SUPABASE_URL") as? String)
+        let key = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_PUBLISHABLE_KEY") as? String)
+        var request = URLRequest(url: try XCTUnwrap(URL(string: base + path)))
+        request.httpMethod = method; request.setValue(key, forHTTPHeaderField: "apikey"); request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let token { request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization") }
+        if method != "GET" { request.httpBody = try JSONSerialization.data(withJSONObject: body) }
+        let (data,response) = try await URLSession.shared.data(for: request)
+        let status = try XCTUnwrap(response as? HTTPURLResponse).statusCode
+        guard (200..<300).contains(status) else { throw NSError(domain: "PlumQATest", code: status, userInfo: [NSLocalizedDescriptionKey:"QA request failed: \(path) (\(status))"]) }
+        return data
+    }
+    @MainActor private func qaLogin(email: String) async throws -> String {
+        guard email.hasPrefix("plum_"), email.hasSuffix("@example.net") else { throw XCTSkip("Use isolated QA accounts for live mutations") }
+        let password = try XCTUnwrap(Bundle(for: Self.self).object(forInfoDictionaryKey: "PLUM_QA_PASSWORD") as? String)
+        let data = try await qaRequest("/auth/v1/token?grant_type=password", body: ["email":email,"password":password])
+        return try XCTUnwrap((try JSONSerialization.jsonObject(with: data) as? [String: Any])?["access_token"] as? String)
+    }
+    @MainActor func testCommentReplyDropdownsAndPersistence() throws {
+        continueAfterFailure = false
+        let bundle = Bundle(for: Self.self)
+        let post = try XCTUnwrap(UUID(uuidString: try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_COMMENT_POST") as? String))).uuidString
+        let parent = try XCTUnwrap(UUID(uuidString: try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_COMMENT_ROOT") as? String))).uuidString
+        let child = try XCTUnwrap(UUID(uuidString: try XCTUnwrap(bundle.object(forInfoDictionaryKey: "PLUM_QA_COMMENT_CHILD") as? String))).uuidString
+        let sentText = "Thread QA sent reply " + UUID().uuidString.prefix(8)
+        let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        let thumbnail = app.buttons["profile.post." + post]
+        XCTAssertTrue(thumbnail.waitForExistence(timeout: 10), app.debugDescription); thumbnail.tap()
+        let rootToggle = app.buttons["comment.replies." + parent]
+        XCTAssertTrue(rootToggle.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(rootToggle.label.contains("Show replies"))
+        XCTAssertFalse(app.staticTexts["Thread QA first reply"].exists)
+        XCTAssertFalse(app.staticTexts["Thread QA second reply"].exists)
+        XCTAssertFalse(app.staticTexts["Thread QA nested reply"].exists)
+        XCTAssertTrue(app.staticTexts["Thread QA separate comment"].exists)
+        for _ in 0..<4 { if rootToggle.isHittable { break }; app.swipeUp() }
+        rootToggle.tap()
+        XCTAssertTrue(app.staticTexts["Thread QA first reply"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Thread QA second reply"].exists)
+        XCTAssertFalse(app.staticTexts["Thread QA nested reply"].exists)
+        XCTAssertTrue(rootToggle.label.contains("Hide replies"))
+        let childToggle = app.buttons["comment.replies." + child]
+        for _ in 0..<4 { if childToggle.isHittable { break }; app.swipeUp() }
+        childToggle.tap()
+        XCTAssertTrue(app.staticTexts["Thread QA nested reply"].waitForExistence(timeout: 5))
+        attach(app, name: "Expanded comment and nested replies")
+        for _ in 0..<5 { if rootToggle.isHittable { break }; app.swipeDown() }
+        rootToggle.tap()
+        XCTAssertFalse(app.staticTexts["Thread QA first reply"].exists)
+        XCTAssertFalse(app.staticTexts["Thread QA nested reply"].exists)
+        XCTAssertTrue(app.staticTexts["Thread QA separate comment"].exists)
+        app.buttons["comment.reply." + parent].tap()
+        let field = app.textFields.matching(identifier: "post.comment").firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText(sentText)
+        app.buttons.matching(identifier: "post.sendComment").firstMatch.tap()
+        XCTAssertTrue(app.staticTexts[sentText].waitForExistence(timeout: 12), app.debugDescription)
+        XCTAssertTrue(rootToggle.label.contains("Hide replies"))
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(thumbnail.waitForExistence(timeout: 10)); thumbnail.tap()
+        XCTAssertTrue(rootToggle.waitForExistence(timeout: 10))
+        XCTAssertTrue(rootToggle.label.contains("Show replies"))
+        XCTAssertFalse(app.staticTexts[sentText].exists)
+        for _ in 0..<4 { if rootToggle.isHittable { break }; app.swipeUp() }
+        rootToggle.tap()
+        XCTAssertTrue(app.staticTexts[sentText].waitForExistence(timeout: 6))
+        attach(app, name: "Reply persisted beneath parent after relaunch")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         try signOutFromProfile(app)
     }

@@ -27,6 +27,8 @@ struct FollowManagementView: View {
     private func remove(_ follow: LiveFollow) { workingID = follow.follower_id; error = nil; Task { defer { workingID = nil }; do { try await PlumAPI.unfollow(follower: follow.follower_id, following: follow.following_id); await load() } catch { self.error = error.localizedDescription } } }
 }
 struct LiveNotificationsView: View {
+    @ObservedObject private var inbox = NotificationInboxStore.shared
+    @State private var visibilityToken = UUID()
     @State private var rows: [LiveNotification] = []
     @State private var actors: [UUID: LiveProfile] = [:]
     @State private var pending: Set<UUID> = []
@@ -36,10 +38,15 @@ struct LiveNotificationsView: View {
     @State private var loading = true
     @State private var canLoadMore = false
     @State private var working: UUID?
+    @State private var followers: Set<UUID> = []
+    @State private var outgoing: [UUID: String] = [:]
+    @State private var reloadAfterLoad = false
+    @State private var isVisible = false
     var body: some View {
         List {
             if loading && rows.isEmpty { ProgressView("Loading notifications…") }
             if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
+            if let error = inbox.error { Text(error).foregroundStyle(.red); Button("Refresh notifications") { Task { await inbox.synchronize(); await load() } } }
             if !loading && error == nil && rows.isEmpty { ContentUnavailableView("You’re all caught up", systemImage: "bell", description: Text("Likes, comments, and follow activity will appear here.")) }
             ForEach(rows) { row in
                 HStack(alignment: .top, spacing: 12) {
@@ -54,12 +61,36 @@ struct LiveNotificationsView: View {
                                 Button("Delete") { respond(actor, notificationID: row.id, approve: false) }.buttonStyle(.bordered)
                             }.disabled(working != nil)
                         }
+                        if let actor = row.actor_id, canFollowBack(row, actor: actor) {
+                            Button(outgoing[actor] == "approved" ? "Following" : outgoing[actor] == "requested" ? "Requested" : "Follow back") { followBack(actor) }
+                                .buttonStyle(.bordered).tint(.plum).disabled(working != nil || outgoing[actor] != nil)
+                                .accessibilityIdentifier("notification.followBack.\(actor.uuidString)")
+                        }
                     }
                     Spacer(minLength: 0)
                 }.padding(.vertical, 6)
             }
             if canLoadMore { Button("Load more notifications") { Task { await load(more: true) } }.disabled(loading) }
-        }.listStyle(.plain).navigationTitle("Notifications").task { await load() }.refreshable { await load() }
+        }.listStyle(.plain).navigationTitle("Notifications")
+            .task { await inbox.beginViewing(visibilityToken); await load() }
+            .onAppear { isVisible = true }
+            .onDisappear { isVisible = false; inbox.endViewing(visibilityToken) }
+            .onChange(of: inbox.revision) { _, _ in if isVisible { if loading { reloadAfterLoad = true } else { Task { await load() } } } }
+            .refreshable { await inbox.synchronize(); await load() }
+    }
+    private func canFollowBack(_ row: LiveNotification, actor: UUID) -> Bool {
+        guard followers.contains(actor), ["follow", "follow_request"].contains(row.kind) else { return false }
+        return rows.first { $0.actor_id == actor && ["follow", "follow_request"].contains($0.kind) }?.id == row.id
+    }
+    private func followBack(_ actor: UUID) {
+        guard working == nil, outgoing[actor] == nil, let person = actors[actor] else { return }
+        working = actor; error = nil
+        Task { defer { working = nil }; do {
+            let me = try await PlumAPI.userID()
+            let follow: LiveFollow = try await PlumAPI.client.from("follows").insert(["follower_id":me.uuidString,"following_id":actor.uuidString,"status":person.visibility == "private" ? "requested" : "approved"]).select().single().execute().value
+            outgoing[actor] = follow.status
+            await inbox.synchronize()
+        } catch { self.error = error.localizedDescription } }
     }
     private func notificationText(_ row: LiveNotification) -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -86,23 +117,30 @@ struct LiveNotificationsView: View {
             if approve { _ = try await PlumAPI.client.from("follows").update(["status":"approved"]).eq("follower_id", value: actor).eq("following_id", value: me).eq("status", value: "requested").execute() }
             else { try await PlumAPI.unfollow(follower: actor, following: me) }
             pending.remove(actor); handled[notificationID] = approve ? "is now following you." : "had their follow request deleted."
+            if approve { followers.insert(actor) }
+            await inbox.synchronize()
         } catch { self.error = error.localizedDescription } }
     }
     private func load(more: Bool = false) async {
-        guard !more || !loading else { return }; loading = true; error = nil; defer { loading = false }
+        guard !Task.isCancelled else { return }
+        if loading && !rows.isEmpty { if !more { reloadAfterLoad = true }; return }
+        loading = true; error = nil
+        defer { loading = false; if reloadAfterLoad { reloadAfterLoad = false; if isVisible && !Task.isCancelled { Task { await load() } } } }
         do {
             let me = try await PlumAPI.userID()
             let people: [LiveProfile] = try await PlumAPI.client.rpc("notification_actor_profiles").execute().value
             actors = Dictionary(uniqueKeysWithValues: people.map { ($0.id, $0) })
-            let requests: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("following_id", value: me).eq("status", value: "requested").execute().value
+            let incoming: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("following_id", value: me).execute().value
+            let requests = incoming.filter { $0.status == "requested" }
+            followers = Set(incoming.filter { $0.status == "approved" }.map(\.follower_id))
+            let following: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("follower_id", value: me).execute().value
+            outgoing = Dictionary(uniqueKeysWithValues: following.map { ($0.following_id, $0.status) })
             pending = Set(requests.map(\.follower_id))
             requestDates = Dictionary(uniqueKeysWithValues: requests.compactMap { request in request.created_at.map { (request.follower_id, $0) } })
             let offset = more ? rows.count : 0
             let next: [LiveNotification] = try await PlumAPI.client.from("notifications").select().order("created_at", ascending: false).order("id").range(from: offset, to: offset + 99).execute().value
             rows = more ? rows + next : next; canLoadMore = next.count == 100
-            let unread = next.filter { $0.read_at == nil }.map(\.id)
-            if !unread.isEmpty { _ = try await PlumAPI.client.from("notifications").update(["read_at":ISO8601DateFormatter().string(from: .now)]).in("id", values: unread).execute() }
-        } catch { self.error = error.localizedDescription }
+        } catch { if !Task.isCancelled { self.error = error.localizedDescription } }
     }
 }
 
@@ -168,13 +206,20 @@ struct ConversationView: View {
             if let error { VStack(alignment: .leading) { Text(error).foregroundStyle(.red); Button(reconnecting ? "Reconnecting…" : "Reconnect") { reconnect() }.disabled(reconnecting) }.padding() }
             ScrollView { LazyVStack(alignment: .leading, spacing: 14) {
                 ForEach(messages) { message in
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(message.sender_id == me ? "You" : "Member").font(.caption).foregroundStyle(.secondary)
-                        if let body = message.body { Text(body) }
-                        if let share = message.post_shares { NavigationLink("Open shared tasting") { PostDetailView(id: share.post_id) } }
-                    }.padding(12).background(message.sender_id == me ? Color.plum.opacity(0.1) : Color.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                    let mine = message.sender_id == me
+                    HStack {
+                        if mine { Spacer(minLength: 48) }
+                        VStack(alignment: .leading, spacing: 5) {
+                            if let body = message.body { Text(body).accessibilityIdentifier("dm.\(mine ? "sent" : "received").\(message.id.uuidString)").accessibilityValue(mine ? "Sent" : "Received") }
+                            if let share = message.post_shares { NavigationLink("Open shared tasting") { PostDetailView(id: share.post_id).tint(.plum) } }
+                        }.padding(12)
+                            .foregroundStyle(mine ? Color.white : Color.primary)
+                            .tint(mine ? .white : .plum)
+                            .background(mine ? Color.plum : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        if !mine { Spacer(minLength: 48) }
+                    }.frame(maxWidth: .infinity, alignment: mine ? .trailing : .leading)
                 }
-            }.padding() }
+            }.padding() }.defaultScrollAnchor(.bottom).scrollDismissesKeyboard(.interactively)
             if sharedPost != nil && !shared { Button("Share this tasting") { send(share: true) }.buttonStyle(.bordered).disabled(conversation == nil || working) }
             HStack { TextField("Message", text: $text).textFieldStyle(.roundedBorder).accessibilityIdentifier("dm.message"); Button("Send") { send(share: false) }.accessibilityIdentifier("dm.send").disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || conversation == nil || working) }.padding()
         }.navigationTitle(otherName ?? "Conversation").navigationBarTitleDisplayMode(.inline)

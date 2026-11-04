@@ -18,6 +18,7 @@
 		432036CE95704620218CF616 /* PlumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBA31CE8BF567E7B225A935 /* PlumApp.swift */; };
 		44E08AED4C7A0D3D4040C374 /* LiveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35639BC7C03D0562A70B24FF /* LiveData.swift */; };
 		4502BC6A743D196EF0A7D33C /* PlumServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0108408EDCBBEF132B4ED7 /* PlumServices.swift */; };
+		4AE4F2453624448963BC72E2 /* NotificationInboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A7A3F50824B0C6010170A5 /* NotificationInboxStore.swift */; };
 		4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */; };
 		57939EC433EB83114D21E7AB /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D907DA15EC4FB3F8081BAE27 /* PostDetailView.swift */; };
 		5819B4845E8DFB2640629C3C /* NotificationRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716EAF48E616FD6735084E60 /* NotificationRegistration.swift */; };
@@ -81,6 +82,7 @@
 		84F7E2CB7DC7DAAF07AEED20 /* Interfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interfaces.swift; sourceTree = "<group>"; };
 		8EAB5471F38F3C0628515EBE /* SupabaseDirectoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseDirectoryService.swift; sourceTree = "<group>"; };
 		8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		97A7A3F50824B0C6010170A5 /* NotificationInboxStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationInboxStore.swift; sourceTree = "<group>"; };
 		9A4885793BCDB3A5ADD77C4B /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		A2859B9FDCA76E74ECC8F0A7 /* ProfileAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAvatar.swift; sourceTree = "<group>"; };
 		A3CE67A328F9DDA7016DC8AA /* AdminConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminConsoleView.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				239080F928F533C99B1F1942 /* AppNavigation.swift */,
+				97A7A3F50824B0C6010170A5 /* NotificationInboxStore.swift */,
 				716EAF48E616FD6735084E60 /* NotificationRegistration.swift */,
 				2F0108408EDCBBEF132B4ED7 /* PlumServices.swift */,
 				9A4885793BCDB3A5ADD77C4B /* SessionStore.swift */,
@@ -363,6 +366,7 @@
 				4C2A23D24A413AF712AFFD8D /* Interfaces.swift in Sources */,
 				44E08AED4C7A0D3D4040C374 /* LiveData.swift in Sources */,
 				D1F637679320255865EE6263 /* Models.swift in Sources */,
+				4AE4F2453624448963BC72E2 /* NotificationInboxStore.swift in Sources */,
 				5819B4845E8DFB2640629C3C /* NotificationRegistration.swift in Sources */,
 				CFA97B7B3EFE2C7E129014B7 /* PhotoProcessing.swift in Sources */,
 				432036CE95704620218CF616 /* PlumApp.swift in Sources */,

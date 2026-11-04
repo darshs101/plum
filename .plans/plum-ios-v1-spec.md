@@ -123,7 +123,7 @@ Users who can view a post can like and comment on it.
 - A commenter can delete their own comment.
 - A post owner can delete any comment on their post.
 - Likes and comments trigger push notifications.
-- Replies are supported and trigger a push notification.
+- Replies are supported and trigger a push notification. Group them beneath their parent comment, collapsed by default, with Show replies / Hide replies controls on that comment. Nested replies use the same per-comment controls. A newly submitted reply opens its parent thread so it can be seen.
 - Users may tag another user in a post or comment only when both accounts follow each other.
 
 ### Direct messages
@@ -131,6 +131,8 @@ Users who can view a post can like and comment on it.
 Messaging is limited to one-to-one conversations between mutual followers. Users can send text and share Plum posts. Photo uploads, group chats, and blocking are out of scope for v1.
 
 The Messages tab lists all mutual approved friends, including friends without an existing conversation. Show their profile pictures and latest message preview. Sort conversations by latest message descending, followed by friends without messages ordered by their most recent mutual follow.
+
+In a conversation, sent messages use solid plum/purple bubbles aligned to the right with white text. Received messages use gray bubbles aligned to the left. Open the conversation at its latest messages.
 
 ## Discovery
 
@@ -165,6 +167,8 @@ Use a simple bottom tab bar with icons only:
 The Profile tab has a bell button in its upper-right corner that opens Notifications and a gear button in its upper-left corner that opens Settings. Settings contains Edit profile (including profile photo upload), Enable notifications, and Sign out. The profile body does not show these actions or a Connections & messages button.
 
 Notifications are one chronological row list with actor pictures, readable activity text, and time. Follow request approval/deletion is inline in its notification row; there is no separate Manage follow requests section. Collection rows show numbered restaurant names, including the restaurant and dish summary for a saved tasting, while a saved tasting still opens that individual post.
+
+The bell shows the exact unread notification count, increasing for each new notification. Opening Notifications marks the recipient's existing notifications read and clears the badge; new arrivals update live. Follower notifications offer an inline Follow back action. For a private target, following back creates an approval request and displays Requested; for a public target, it follows immediately and displays Following.
 
 Push notifications in v1:
 

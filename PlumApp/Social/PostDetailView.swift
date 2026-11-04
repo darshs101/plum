@@ -8,11 +8,13 @@ struct PostDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var post: LivePost?
     @State private var comments: [LiveComment] = []
+    @State private var expandedComments: Set<UUID> = []
     @State private var likes = 0
     @State private var liked = false
     @State private var me: UUID?
     @State private var bodyText = ""
     @State private var replyTo: LiveComment?
+    @FocusState private var commentFocused: Bool
     @State private var error: String?
     @State private var loading = true
     @State private var working = false
@@ -50,14 +52,23 @@ struct PostDetailView: View {
                         } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Post options").accessibilityIdentifier("post.options")
                     }.disabled(working)
                     Text("Comments").font(.headline)
-                    ForEach(comments) { comment in commentRow(comment, post: post) }
+                    let ids = Set(comments.map(\.id))
+                    let children = repliesByParent
+                    ForEach(comments.filter { $0.parent_id.map { !ids.contains($0) } ?? true }) { comment in
+                        CommentThreadRow(comment: comment, children: children, expanded: $expandedComments, me: me, postOwner: post.author_id, working: working, onReply: { replyTo = $0; commentFocused = true }, onDelete: { comment in
+                            action { _ = try await PlumAPI.client.from("comments").delete().eq("id", value: comment.id).execute(); await load() }
+                        })
+                        Divider()
+                    }
                     if comments.isEmpty { Text("Start the conversation.").foregroundStyle(.secondary) }
                     if let replyTo { HStack { Text("Replying to @\(replyTo.profiles?.username ?? "member")").font(.caption); Button("Cancel") { self.replyTo = nil } } }
-                    TextField("Add a comment", text: $bodyText, axis: .vertical).textFieldStyle(.roundedBorder).accessibilityIdentifier("post.comment")
+                    TextField("Add a comment", text: $bodyText, axis: .vertical).textFieldStyle(.roundedBorder).accessibilityIdentifier("post.comment").focused($commentFocused).disabled(working)
                     Button("Send comment") { action {
                         guard let me else { return }
                         struct NewComment: Encodable { let post_id: UUID; let author_id: UUID; let body: String; let parent_id: UUID? }
-                        _ = try await PlumAPI.client.from("comments").insert(NewComment(post_id: id, author_id: me, body: bodyText.trimmingCharacters(in: .whitespacesAndNewlines), parent_id: replyTo?.id)).execute()
+                        let parent = replyTo?.id
+                        _ = try await PlumAPI.client.from("comments").insert(NewComment(post_id: id, author_id: me, body: bodyText.trimmingCharacters(in: .whitespacesAndNewlines), parent_id: parent)).execute()
+                        if let parent { expandedComments.insert(parent) }
                         bodyText = ""; replyTo = nil; await load()
                     } }.accessibilityIdentifier("post.sendComment").disabled(working || bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -69,13 +80,9 @@ struct PostDetailView: View {
             .sheet(isPresented: $editing, onDismiss: { Task { await load() } }) { if let post { EditPostView(post: post) } }
             .confirmationDialog("Delete this post and its ratings?", isPresented: $deleting) { Button("Delete post", role: .destructive) { action { try await PlumAPI.removePost(id); if let onDeleted { onDeleted() } else { dismiss() } } } }
     }
-    private func commentRow(_ comment: LiveComment, post: LivePost) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("@\(comment.profiles?.username ?? "member")").font(.caption.bold())
-            if comment.parent_id != nil { Label("Reply", systemImage: "arrow.turn.down.right").font(.caption).foregroundStyle(.secondary) }
-            Text(comment.body)
-            HStack { Button("Reply") { replyTo = comment }; if me == comment.author_id || me == post.author_id { Button("Delete", role: .destructive) { action { _ = try await PlumAPI.client.from("comments").delete().eq("id", value: comment.id).execute(); await load() } } } }.font(.caption)
-            Divider()
+    private var repliesByParent: [UUID: [LiveComment]] {
+        comments.reduce(into: [:]) { groups, comment in
+            if let parent = comment.parent_id { groups[parent, default: []].append(comment) }
         }
     }
     private func action(_ task: @escaping @MainActor () async throws -> Void) { guard !working else { return }; working = true; error = nil; Task { defer { working = false }; do { try await task() } catch { self.error = error.localizedDescription } } }
@@ -84,11 +91,55 @@ struct PostDetailView: View {
         do {
             me = try await PlumAPI.userID(); post = try await PlumAPI.posts(id: id).first
             if post == nil { throw SocialClientError.permissionDenied }
-            comments = try await PlumAPI.client.from("comments").select("*,profiles!comments_author_id_fkey(username)").eq("post_id", value: id).order("created_at").execute().value
+            comments = try await PlumAPI.client.from("comments").select("*,profiles!comments_author_id_fkey(username)").eq("post_id", value: id).order("created_at").order("id").execute().value
+            let commentIDs = Set(comments.map(\.id)); expandedComments.formIntersection(commentIDs)
+            if let replyTo, !commentIDs.contains(replyTo.id) { self.replyTo = nil }
             struct Like: Decodable { let user_id: UUID }
             let rows: [Like] = try await PlumAPI.client.from("likes").select("user_id").eq("post_id", value: id).execute().value
             likes = rows.count; liked = rows.contains { $0.user_id == me }
         } catch { self.error = error.localizedDescription }
+    }
+}
+
+private struct CommentThreadRow: View {
+    let comment: LiveComment
+    let children: [UUID: [LiveComment]]
+    @Binding var expanded: Set<UUID>
+    let me: UUID?
+    let postOwner: UUID
+    let working: Bool
+    let onReply: (LiveComment) -> Void
+    let onDelete: (LiveComment) -> Void
+    var depth = 0
+    private var replies: [LiveComment] { children[comment.id] ?? [] }
+    private var isExpanded: Bool { expanded.contains(comment.id) }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("@\(comment.profiles?.username ?? "member")").font(.caption.bold())
+            Text(comment.body)
+            HStack {
+                Button("Reply") { onReply(comment) }.accessibilityIdentifier("comment.reply.\(comment.id.uuidString)")
+                if me == comment.author_id || me == postOwner {
+                    Button("Delete", role: .destructive) { onDelete(comment) }.accessibilityIdentifier("comment.delete.\(comment.id.uuidString)")
+                }
+            }.font(.caption).disabled(working)
+            if !replies.isEmpty {
+                Button {
+                    if isExpanded { expanded.remove(comment.id) } else { expanded.insert(comment.id) }
+                } label: {
+                    Label(isExpanded ? "Hide replies" : "Show replies", systemImage: isExpanded ? "chevron.up" : "chevron.down")
+                }.font(.caption.weight(.semibold)).foregroundStyle(.plum)
+                    .accessibilityIdentifier("comment.replies.\(comment.id.uuidString)")
+                    .accessibilityValue("\(replies.count) replies, \(isExpanded ? "expanded" : "collapsed")")
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: 14) {
+                        ForEach(replies) { reply in
+                            CommentThreadRow(comment: reply, children: children, expanded: $expanded, me: me, postOwner: postOwner, working: working, onReply: onReply, onDelete: onDelete, depth: depth + 1)
+                        }
+                    }.padding(.leading, depth < 3 ? 16 : 0)
+                }
+            }
+        }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

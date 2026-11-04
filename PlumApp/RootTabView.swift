@@ -4,6 +4,8 @@ struct RootTabView: View {
     @ObservedObject private var navigation = AppNavigation.shared
     @State private var openedRoute: NotificationRoute?
     @State private var selection: AppTab
+    @State private var notificationConnection = 0
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         let arguments = ProcessInfo.processInfo.arguments
@@ -24,6 +26,8 @@ struct RootTabView: View {
             ProfileView().tabItem { Image(systemName: "person").accessibilityLabel("Profile") }.tag(AppTab.profile)
         }
         .tint(.plum)
+        .task(id: notificationConnection) { await NotificationInboxStore.shared.listen() }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { notificationConnection += 1 } }
         .task(id: navigation.pendingNotification) {
             guard let route = navigation.pendingNotification else { return }
             guard let me = try? await PlumAPI.userID() else { return }

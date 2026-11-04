@@ -18,23 +18,43 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>PLUM_QA_CHAT_FRIEND_NAME</key>
+	<string>$(PLUM_QA_CHAT_FRIEND_NAME)</string>
+	<key>PLUM_QA_COMMENT_CHILD</key>
+	<string>$(PLUM_QA_COMMENT_CHILD)</string>
+	<key>PLUM_QA_COMMENT_POST</key>
+	<string>$(PLUM_QA_COMMENT_POST)</string>
+	<key>PLUM_QA_COMMENT_ROOT</key>
+	<string>$(PLUM_QA_COMMENT_ROOT)</string>
 	<key>PLUM_QA_DIARY_SELECTED_POST</key>
 	<string>$(PLUM_QA_DIARY_SELECTED_POST)</string>
 	<key>PLUM_QA_EMAIL</key>
 	<string>$(PLUM_QA_EMAIL)</string>
+	<key>PLUM_QA_FOLLOWER_EMAIL</key>
+	<string>$(PLUM_QA_FOLLOWER_EMAIL)</string>
+	<key>PLUM_QA_FOLLOWER_ID</key>
+	<string>$(PLUM_QA_FOLLOWER_ID)</string>
 	<key>PLUM_QA_FRIEND_NAME</key>
 	<string>$(PLUM_QA_FRIEND_NAME)</string>
 	<key>PLUM_QA_OWNER_NAME</key>
 	<string>$(PLUM_QA_OWNER_NAME)</string>
 	<key>PLUM_QA_PASSWORD</key>
 	<string>$(PLUM_QA_PASSWORD)</string>
+	<key>PLUM_QA_PUBLISHABLE_KEY</key>
+	<string>$(SUPABASE_PUBLISHABLE_KEY)</string>
+	<key>PLUM_QA_RECEIVED_TEXT</key>
+	<string>$(PLUM_QA_RECEIVED_TEXT)</string>
 	<key>PLUM_QA_RESTAURANT_NAME</key>
 	<string>$(PLUM_QA_RESTAURANT_NAME)</string>
 	<key>PLUM_QA_SECOND_EMAIL</key>
 	<string>$(PLUM_QA_SECOND_EMAIL)</string>
+	<key>PLUM_QA_SENT_TEXT</key>
+	<string>$(PLUM_QA_SENT_TEXT)</string>
 	<key>PLUM_QA_SIGNUP_EMAIL</key>
 	<string>$(PLUM_QA_SIGNUP_EMAIL)</string>
 	<key>PLUM_QA_SIGNUP_USERNAME</key>
 	<string>$(PLUM_QA_SIGNUP_USERNAME)</string>
+	<key>PLUM_QA_SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
 </dict>
 </plist>
