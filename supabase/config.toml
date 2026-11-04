@@ -1,0 +1,12 @@
+project_id = "plum"
+
+[api]
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+
+[db]
+major_version = 17
+
+# Local development matches the v1 email flow. Hosted Auth settings are managed separately.
+[auth.email]
+enable_confirmations = false

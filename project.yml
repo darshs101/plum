@@ -1,0 +1,80 @@
+name: Plum
+options:
+  minimumXcodeGenVersion: 2.38.0
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift.git
+    exactVersion: 2.55.6
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+targets:
+  Plum:
+    type: application
+    platform: iOS
+    info:
+      path: PlumApp/Info.plist
+      properties:
+        CFBundleDisplayName: Plum
+        SUPABASE_URL: $(SUPABASE_URL)
+        SUPABASE_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - plum
+        UILaunchScreen: {}
+    sources:
+      - path: PlumApp
+      - path: Sources/PlumDomain
+    dependencies:
+      - package: Supabase
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plum.app
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_SUPABASE_URL: $(SUPABASE_URL)
+        INFOPLIST_KEY_SUPABASE_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)
+    configFiles:
+      Debug: Config/Debug.xcconfig
+      Release: Config/Release.xcconfig
+  PlumUITests:
+    info:
+      path: Tests/PlumUITests/Info.plist
+      properties:
+        PLUM_QA_EMAIL: $(PLUM_QA_EMAIL)
+        PLUM_QA_PASSWORD: $(PLUM_QA_PASSWORD)
+        PLUM_QA_SIGNUP_EMAIL: $(PLUM_QA_SIGNUP_EMAIL)
+        PLUM_QA_SIGNUP_USERNAME: $(PLUM_QA_SIGNUP_USERNAME)
+        PLUM_QA_RESTAURANT_NAME: $(PLUM_QA_RESTAURANT_NAME)
+        PLUM_QA_FRIEND_NAME: $(PLUM_QA_FRIEND_NAME)
+        PLUM_QA_DIARY_SELECTED_POST: $(PLUM_QA_DIARY_SELECTED_POST)
+        PLUM_QA_SECOND_EMAIL: $(PLUM_QA_SECOND_EMAIL)
+        PLUM_QA_OWNER_NAME: $(PLUM_QA_OWNER_NAME)
+        PLUM_QA_COMMENT_POST: $(PLUM_QA_COMMENT_POST)
+        PLUM_QA_COMMENT_ROOT: $(PLUM_QA_COMMENT_ROOT)
+        PLUM_QA_COMMENT_CHILD: $(PLUM_QA_COMMENT_CHILD)
+        PLUM_QA_SUPABASE_URL: $(SUPABASE_URL)
+        PLUM_QA_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)
+        PLUM_QA_FOLLOWER_EMAIL: $(PLUM_QA_FOLLOWER_EMAIL)
+        PLUM_QA_FOLLOWER_ID: $(PLUM_QA_FOLLOWER_ID)
+        PLUM_QA_CHAT_FRIEND_NAME: $(PLUM_QA_CHAT_FRIEND_NAME)
+        PLUM_QA_SENT_TEXT: $(PLUM_QA_SENT_TEXT)
+        PLUM_QA_RECEIVED_TEXT: $(PLUM_QA_RECEIVED_TEXT)
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/PlumUITests
+    dependencies:
+      - target: Plum
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plum.app.uitests
+        GENERATE_INFOPLIST_FILE: NO
+        TEST_TARGET_NAME: Plum
+        INFOPLIST_KEY_PLUM_QA_EMAIL: $(PLUM_QA_EMAIL)
+        INFOPLIST_KEY_PLUM_QA_PASSWORD: $(PLUM_QA_PASSWORD)
+        INFOPLIST_KEY_PLUM_QA_SIGNUP_EMAIL: $(PLUM_QA_SIGNUP_EMAIL)
+        INFOPLIST_KEY_PLUM_QA_SIGNUP_USERNAME: $(PLUM_QA_SIGNUP_USERNAME)

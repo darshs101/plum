@@ -1,0 +1,9 @@
+.build/
+DerivedData/
+*.xcuserstate
+.DS_Store
+Config/Secrets.xcconfig
+
+# Per-user Xcode state and Supabase CLI cache
+Plum.xcodeproj/xcuserdata/
+supabase/.temp/
