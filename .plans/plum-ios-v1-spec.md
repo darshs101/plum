@@ -177,7 +177,7 @@ Push notifications in v1:
 
 ## Reporting and administration
 
-Users can report posts, accounts, and photos. The first internal moderation console must let admins:
+Users can report posts and accounts. The post's three-dot menu has one Report post action and no individual-photo reporting actions. The first internal moderation console must let admins:
 
 - Triage/process reports
 - Remove content

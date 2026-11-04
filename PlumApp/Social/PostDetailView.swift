@@ -21,7 +21,6 @@ struct PostDetailView: View {
     @State private var editing = false
     @State private var sharing = false
     @State private var deleting = false
-    @State private var reportedPhoto: LivePhoto?
     init(id: UUID, embedded: Bool = false, onDeleted: (() -> Void)? = nil, initialPost: LivePost? = nil, reloadToken: Int = 0) {
         self.id = id; self.embedded = embedded; self.onDeleted = onDeleted
         self.reloadToken = reloadToken
@@ -46,7 +45,6 @@ struct PostDetailView: View {
                         Button { sharing = true } label: { Image(systemName: "paperplane") }.accessibilityLabel("Share in message")
                         Spacer()
                         Menu {
-                            ForEach(Array(post.post_photos.enumerated()), id: \.element.id) { index, photo in Button("Report photo \(index + 1)") { reportedPhoto = photo } }
                             Button("Report post", role: .destructive) { reporting = true }
                             if me == post.author_id { Button("Edit post") { editing = true }; Button("Delete post", role: .destructive) { deleting = true } }
                         } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Post options").accessibilityIdentifier("post.options")
@@ -65,7 +63,6 @@ struct PostDetailView: View {
                 }
             }.padding(18)
             .task(id: reloadToken) { await load() }
-            .sheet(item: $reportedPhoto) { photo in ReportContentView(type: "photo", id: photo.id) }
             .sheet(isPresented: $reporting) { ReportContentView(type: "post", id: id) }
             .sheet(isPresented: $saving) { AddToCollectionView(postID: id) }
             .sheet(isPresented: $sharing) { SharePostView(postID: id) }
