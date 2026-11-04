@@ -25,8 +25,10 @@
 		72E46433DE35F0EDE20A90EC /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C74B8DC858D6E7B75EBF11A8 /* README.md */; };
 		74A18D67473DC67BB3060CB7 /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE06C09058DD6B58EAADF4E7 /* EditPostView.swift */; };
 		755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */; };
+		763712ADE4DD47991EA9AABD /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E6C5E2EB3B295A353CC2FB /* ProfileSettingsView.swift */; };
 		82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */; };
 		8624863B5B4310927D954018 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */; };
+		87C46B36D9CA3C905CC88B4B /* ProfileAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2859B9FDCA76E74ECC8F0A7 /* ProfileAvatar.swift */; };
 		98DEE50B210EAFE83BE74736 /* AddRestaurantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1122C69533EC3DF3D6C7A75 /* AddRestaurantView.swift */; };
 		9F4619781F544DEEA019B4AC /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239080F928F533C99B1F1942 /* AppNavigation.swift */; };
 		A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31EFD115951F898BD54F1A /* SocialActionsView.swift */; };
@@ -76,10 +78,12 @@
 		8EAB5471F38F3C0628515EBE /* SupabaseDirectoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseDirectoryService.swift; sourceTree = "<group>"; };
 		8F218658CB0FD84DA1FD7A69 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		9A4885793BCDB3A5ADD77C4B /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		A2859B9FDCA76E74ECC8F0A7 /* ProfileAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAvatar.swift; sourceTree = "<group>"; };
 		A3CE67A328F9DDA7016DC8AA /* AdminConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminConsoleView.swift; sourceTree = "<group>"; };
 		A75B1EB341730705655281E3 /* DirectoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryDetailView.swift; sourceTree = "<group>"; };
 		ADF14AB32869152306A29C4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B1122C69533EC3DF3D6C7A75 /* AddRestaurantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRestaurantView.swift; sourceTree = "<group>"; };
+		B9E6C5E2EB3B295A353CC2FB /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		C74B8DC858D6E7B75EBF11A8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D907DA15EC4FB3F8081BAE27 /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		DB54A85AEE591AEC218D4966 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
@@ -169,6 +173,7 @@
 			children = (
 				EAAC767CC23054256564DD1D /* PhotoProcessing.swift */,
 				6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */,
+				A2859B9FDCA76E74ECC8F0A7 /* ProfileAvatar.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -214,6 +219,7 @@
 				0AE6C171CD3CD7826061A37B /* ExploreView.swift */,
 				EE69B39D1A4B5884326E28D7 /* Info.plist */,
 				7DBA31CE8BF567E7B225A935 /* PlumApp.swift */,
+				B9E6C5E2EB3B295A353CC2FB /* ProfileSettingsView.swift */,
 				38205E8225ABE3E289D31FCE /* ProfileView.swift */,
 				54CCA213BC9909E7BDD25DED /* RootTabView.swift */,
 				EA25B654BCBBB9FDD0E01585 /* Auth */,
@@ -357,6 +363,8 @@
 				4502BC6A743D196EF0A7D33C /* PlumServices.swift in Sources */,
 				82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */,
 				57939EC433EB83114D21E7AB /* PostDetailView.swift in Sources */,
+				87C46B36D9CA3C905CC88B4B /* ProfileAvatar.swift in Sources */,
+				763712ADE4DD47991EA9AABD /* ProfileSettingsView.swift in Sources */,
 				5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */,
 				22465322126F5387ED7C37C0 /* RootTabView.swift in Sources */,
 				755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */,

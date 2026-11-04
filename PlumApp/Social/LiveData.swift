@@ -8,6 +8,7 @@ struct LiveProfile: Codable, Identifiable, Sendable {
     var visibility: String
     var city: String?
     var neighborhood: String?
+    var avatar_path: String?
 }
 struct LiveDish: Codable, Identifiable, Sendable { let id: UUID; let name: String; let restaurant_id: UUID }
 struct LiveRating: Codable, Identifiable, Sendable { let id: UUID; let dish_id: UUID; var rating: Double; let dishes: DishLabel?; struct DishLabel: Codable, Sendable { let name: String } }
@@ -18,9 +19,16 @@ struct LivePost: Codable, Identifiable, Sendable {
     struct PlaceLabel: Codable, Sendable { let name: String; let neighborhood: String? }
 }
 struct LiveCollection: Codable, Identifiable, Sendable { let id: UUID; let owner_id: UUID; var title: String; var kind: String; var is_public: Bool }
-struct LiveCollectionItem: Codable, Identifiable, Sendable { let id: UUID; let restaurant_id: UUID?; let post_id: UUID?; var rank: Int?; let restaurants: PlaceName?; struct PlaceName: Codable, Sendable { let name: String } }
+struct LiveCollectionItem: Codable, Identifiable, Sendable {
+    let id: UUID; let restaurant_id: UUID?; let post_id: UUID?; var rank: Int?
+    let restaurants: PlaceName?; var posts: SavedPost?
+    struct PlaceName: Codable, Sendable { let name: String }
+    struct SavedPost: Codable, Sendable { let restaurants: PlaceName?; let post_dishes: [LiveRating] }
+    var restaurantName: String { restaurants?.name ?? posts?.restaurants?.name ?? "Unavailable tasting" }
+}
 struct LiveComment: Codable, Identifiable, Sendable { let id: UUID; let author_id: UUID; let body: String; let parent_id: UUID?; let created_at: Date; let profiles: Name?; struct Name: Codable, Sendable { let username: String } }
-struct LiveFollow: Codable, Sendable { let follower_id: UUID; let following_id: UUID; let status: String }
+struct LiveFollow: Codable, Sendable { let follower_id: UUID; let following_id: UUID; let status: String; var created_at: Date? }
+struct LiveInboxFriend: Decodable, Identifiable, Sendable { let id: UUID; let username: String; let display_name: String; let avatar_path: String?; let last_message: String?; let last_message_at: Date?; let followed_at: Date }
 struct LiveNotification: Codable, Identifiable, Sendable { let id: UUID; let kind: String; let actor_id: UUID?; let post_id: UUID?; let created_at: Date; let read_at: Date? }
 struct LiveConversation: Codable, Identifiable, Sendable { let id: UUID; let direct_key: String }
 struct LiveMessage: Codable, Identifiable, Sendable { let id: UUID; let sender_id: UUID; let body: String?; let created_at: Date; let post_shares: SharedPost?; struct SharedPost: Codable, Sendable { let post_id: UUID } }
@@ -30,9 +38,9 @@ enum PlumAPI {
     static func userID() async throws -> UUID { try await client.auth.session.user.id }
     static func profile(_ id: UUID) async throws -> LiveProfile {
         let rows: [LiveProfile] = try await client.rpc("profile_identity", params: ["subject":id.uuidString]).execute().value
-        guard let profile = rows.first else { throw SocialClientError.permissionDenied }; return profile
+        guard var profile = rows.first else { throw SocialClientError.permissionDenied }; struct Avatar: Decodable { let avatar_path: String? }; let avatar: [Avatar] = try await client.from("profiles").select("avatar_path").eq("id", value: id).execute().value; profile.avatar_path = avatar.first?.avatar_path; return profile
     }
-    static let postSelection = "*,profiles!posts_author_id_fkey(id,username,display_name,visibility,city,neighborhood),restaurants!posts_restaurant_id_fkey(name,neighborhood),post_dishes(id,dish_id,rating,dishes(name)),post_photos(id,storage_path,position)"
+    static let postSelection = "*,profiles!posts_author_id_fkey(id,username,display_name,visibility,city,neighborhood,avatar_path),restaurants!posts_restaurant_id_fkey(name,neighborhood),post_dishes(id,dish_id,rating,dishes(name)),post_photos(id,storage_path,position)"
     static func hydrate(_ rows: [LivePost]) async throws -> [LivePost] {
         var rows = rows
         for i in rows.indices {

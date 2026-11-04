@@ -20,6 +20,7 @@ struct RootTabView: View {
             HomeView().tabItem { Image(systemName: "house").accessibilityLabel("Home") }.tag(AppTab.home)
             ExploreView().tabItem { Image(systemName: "magnifyingglass").accessibilityLabel("Explore") }.tag(AppTab.explore)
             CreatePostView().tabItem { Image(systemName: "plus").accessibilityLabel("Create") }.tag(AppTab.create)
+            NavigationStack { MessagesInboxView() }.tabItem { Image(systemName: "paperplane").accessibilityLabel("Messages") }.tag(AppTab.messages)
             ProfileView().tabItem { Image(systemName: "person").accessibilityLabel("Profile") }.tag(AppTab.profile)
         }
         .tint(.plum)
@@ -36,7 +37,7 @@ struct RootTabView: View {
                     switch route.destination {
                     case .post: if let id = route.targetID { PostDetailView(id: id) }
                     case .profile: if let id = route.targetID { MemberProfileView(id: id) }
-                    case .requests: FollowManagementView()
+                    case .requests: LiveNotificationsView()
                     }
                 }.toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { openedRoute = nil } } }
             }
@@ -44,7 +45,7 @@ struct RootTabView: View {
     }
 }
 
-enum AppTab: String { case home, explore, create, profile }
+enum AppTab: String { case home, explore, create, messages, profile }
 
 extension Color { static let plum = Color(red: 0.35, green: 0.08, blue: 0.24) }
 

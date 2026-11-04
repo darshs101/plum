@@ -44,13 +44,18 @@ struct CollectionDetailView: View {
         List {
             if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
             if let collection {
-                Section { Label(collection.kind == "ranked" ? "Manual ranking" : "Unranked collection", systemImage: collection.kind == "ranked" ? "list.number" : "bookmark"); Text(collection.is_public ? "Public" : "Private") }
+                Section { Label(collection.kind == "ranked" ? "Manual ranking" : "Restaurants", systemImage: collection.kind == "ranked" ? "list.number" : "bookmark"); Text(collection.is_public ? "Public" : "Private") }
                 if items.isEmpty { Text("This collection is empty. Save restaurants from Explore or posts from their tasting page.") }
-                ForEach(items) { item in
-                    HStack {
-                        if collection.kind == "ranked" { Text("\(item.rank ?? 0).").foregroundStyle(.secondary) }
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    HStack(alignment: .top, spacing: 12) {
+                        Text("\(item.rank ?? index + 1).").font(.headline).foregroundStyle(.secondary).frame(minWidth: 24, alignment: .trailing)
                         if let restaurant = item.restaurant_id { NavigationLink(item.restaurants?.name ?? "Restaurant") { DirectoryDetailView(restaurantID: restaurant) } }
-                        else if let post = item.post_id { NavigationLink("Open saved tasting") { PostDetailView(id: post) } }
+                        else if let post = item.post_id { NavigationLink { PostDetailView(id: post) } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.restaurantName).font(.headline)
+                                if let dishes = item.posts?.post_dishes, !dishes.isEmpty { Text(dishes.map { "\($0.dishes?.name ?? "Dish") · \($0.rating.formatted()) ★" }.joined(separator: ", ")).font(.subheadline).foregroundStyle(.secondary) }
+                            }
+                        } }
                         else { Text("Unavailable saved item").foregroundStyle(.secondary) }
                     }.deleteDisabled(!owner).moveDisabled(!owner || collection.kind != "ranked")
                 }.onDelete { offsets in guard owner else { return }; let removed = offsets.map { items[$0] }; Task { do { for item in removed { _ = try await PlumAPI.client.from("collection_items").delete().eq("id", value: item.id).execute() }; await load() } catch { self.error = error.localizedDescription } } }
@@ -60,7 +65,7 @@ struct CollectionDetailView: View {
         .sheet(isPresented: $settingsOpen) { if let collection { EditCollectionView(collection: collection) { deleted in if deleted { dismiss() } else { Task { await load() } } } } }
         .task { await load() }.refreshable { await load() }
     }
-    private func load() async { do { collection = try await PlumAPI.client.from("collections").select().eq("id", value: id).single().execute().value; owner = try await collection?.owner_id == PlumAPI.userID(); items = try await PlumAPI.client.from("collection_items").select("*,restaurants(name)").eq("collection_id", value: id).order("rank").order("created_at").execute().value } catch { self.error = error.localizedDescription } }
+    private func load() async { do { collection = try await PlumAPI.client.from("collections").select().eq("id", value: id).single().execute().value; owner = try await collection?.owner_id == PlumAPI.userID(); items = try await PlumAPI.client.from("collection_items").select("*,restaurants(name),posts(restaurants(name),post_dishes(id,dish_id,rating,dishes(name)))").eq("collection_id", value: id).order("rank").order("created_at").execute().value } catch { self.error = error.localizedDescription } }
 }
 
 struct EditCollectionView: View {

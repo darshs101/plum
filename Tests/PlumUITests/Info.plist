@@ -20,6 +20,8 @@
 	<string>1</string>
 	<key>PLUM_QA_EMAIL</key>
 	<string>$(PLUM_QA_EMAIL)</string>
+	<key>PLUM_QA_FRIEND_NAME</key>
+	<string>$(PLUM_QA_FRIEND_NAME)</string>
 	<key>PLUM_QA_PASSWORD</key>
 	<string>$(PLUM_QA_PASSWORD)</string>
 	<key>PLUM_QA_RESTAURANT_NAME</key>

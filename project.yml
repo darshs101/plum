@@ -49,6 +49,7 @@ targets:
         PLUM_QA_SIGNUP_EMAIL: $(PLUM_QA_SIGNUP_EMAIL)
         PLUM_QA_SIGNUP_USERNAME: $(PLUM_QA_SIGNUP_USERNAME)
         PLUM_QA_RESTAURANT_NAME: $(PLUM_QA_RESTAURANT_NAME)
+        PLUM_QA_FRIEND_NAME: $(PLUM_QA_FRIEND_NAME)
     type: bundle.ui-testing
     platform: iOS
     sources:

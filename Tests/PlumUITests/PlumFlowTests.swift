@@ -27,7 +27,7 @@ final class PlumFlowTests: XCTestCase {
         app.swipeUp()
         app.buttons["Skip for now"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15), app.debugDescription)
-        app.tabBars.buttons.element(boundBy: 3).tap()
+        app.tabBars.buttons.element(boundBy: 4).tap()
         XCTAssertTrue(app.staticTexts[username].waitForExistence(timeout: 10), app.debugDescription)
         attach(app, name: "Fresh signup and profile")
         app.terminate(); app.launch()
@@ -53,8 +53,8 @@ final class PlumFlowTests: XCTestCase {
         if getStarted.waitForExistence(timeout: 8) { getStarted.tap() }
         if app.buttons["Not Now"].waitForExistence(timeout: 2) { app.buttons["Not Now"].tap() }
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15), app.debugDescription)
-        app.tabBars.buttons.element(boundBy: 3).tap()
-        XCTAssertTrue(app.buttons["Edit profile"].waitForExistence(timeout: 15), app.debugDescription)
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 15), app.debugDescription)
         XCTAssertTrue(app.staticTexts["Private account"].exists)
         let saved = app.buttons["Saved Places"]
         if !saved.exists { app.swipeUp() }
@@ -64,8 +64,8 @@ final class PlumFlowTests: XCTestCase {
         attach(app, name: "Persisted Saved Places")
         app.terminate(); app.launch()
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15), "Session should survive a relaunch")
-        app.tabBars.buttons.element(boundBy: 3).tap()
-        XCTAssertTrue(app.buttons["Edit profile"].waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 15))
         attach(app, name: "Profile after relaunch")
         app.tabBars.buttons.element(boundBy: 1).tap()
         XCTAssertTrue(app.textFields["Search restaurants, dishes, people, lists"].waitForExistence(timeout: 10))
@@ -113,7 +113,7 @@ final class PlumFlowTests: XCTestCase {
         continueAfterFailure = false
         let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
-        app.tabBars.buttons.element(boundBy: 3).tap()
+        app.tabBars.buttons.element(boundBy: 4).tap()
         let post = app.buttons.matching(NSPredicate(format: "label == %@", restaurantName)).firstMatch
         XCTAssertTrue(post.waitForExistence(timeout: 10), app.debugDescription); post.tap()
         XCTAssertTrue(app.buttons["post.like"].waitForExistence(timeout: 10), app.debugDescription)
@@ -136,14 +136,88 @@ final class PlumFlowTests: XCTestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Edited in simulator audit")).firstMatch.waitForExistence(timeout: 15), app.debugDescription)
         attach(app, name: "Comment and edited post persisted")
     }
-    @MainActor func testZSignOutLeavesWelcomeReady() throws {
+    @MainActor func testSocialNavigationPhotosAndRankedRestaurants() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15), app.debugDescription)
+        XCTAssertEqual(app.tabBars.buttons.count, 5)
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        let friend = try XCTUnwrap(Bundle(for: Self.self).object(forInfoDictionaryKey: "PLUM_QA_FRIEND_NAME") as? String)
+        let friendRow = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", friend)).firstMatch
+        XCTAssertTrue(friendRow.waitForExistence(timeout: 12), app.debugDescription); friendRow.tap()
+        let message = app.textFields["dm.message"]
+        let messageText = "Simulator social check " + UUID().uuidString.prefix(8)
+        XCTAssertTrue(message.waitForExistence(timeout: 10)); message.tap(); message.typeText(messageText)
+        app.buttons["dm.send"].tap()
+        XCTAssertTrue(app.staticTexts[messageText].waitForExistence(timeout: 10), app.debugDescription)
+        app.navigationBars.buttons["Messages"].tap()
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 12), app.debugDescription)
+        XCTAssertFalse(app.buttons["Connections & messages"].exists)
+        XCTAssertFalse(app.buttons["Enable notifications"].exists)
+        XCTAssertFalse(app.buttons["Edit profile"].exists)
+        XCTAssertFalse(app.buttons["Sign out"].exists)
+        app.buttons["Notifications"].tap()
+        XCTAssertFalse(app.buttons["Manage follow requests"].exists)
+        let requester = friend.replacingOccurrences(of: "_c_", with: "_d_")
+        let privateRequest = app.buttons.matching(NSPredicate(format: "label CONTAINS %@ AND label CONTAINS %@", requester, "requested to follow")).firstMatch
+        XCTAssertTrue(privateRequest.waitForExistence(timeout: 12), app.debugDescription); privateRequest.tap()
+        XCTAssertTrue(app.staticTexts["Only approved followers can view this private profile’s posts and collections."].waitForExistence(timeout: 10), app.debugDescription)
+        app.navigationBars.buttons["Notifications"].tap()
+        let confirm = app.buttons["Confirm"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 12), app.debugDescription); confirm.tap()
+        expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: confirm); waitForExpectations(timeout: 10)
+        attach(app, name: "Flat notifications with inline requests")
+        app.navigationBars.buttons["Profile"].tap()
+        app.buttons["profile.settings"].tap()
+        XCTAssertTrue(app.buttons["Enable notifications"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Sign out"].exists)
+        app.buttons["Edit profile"].tap()
+        app.buttons["profile.photoPicker"].tap()
+        let photo = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
+        XCTAssertTrue(photo.waitForExistence(timeout: 10), app.debugDescription); photo.tap()
+        if app.buttons["Done"].waitForExistence(timeout: 2) { app.buttons["Done"].tap() }
+        app.swipeUp()
+        let save = app.buttons["profile.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 6), app.debugDescription)
+        expectation(for: NSPredicate(format: "enabled == true"), evaluatedWith: save); waitForExpectations(timeout: 10)
+        save.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 15), app.debugDescription)
+        app.navigationBars.buttons["Profile"].tap()
+        let collection = app.buttons["Social QA rankings"]
+        for _ in 0..<4 { if collection.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(collection.waitForExistence(timeout: 8), app.debugDescription); collection.tap()
+        XCTAssertTrue(app.staticTexts[restaurantName].waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["1."].exists)
+        XCTAssertFalse(app.staticTexts["Open saved tasting"].exists)
+        attach(app, name: "Ranked restaurant instead of generic saved tasting")
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        XCTAssertTrue(app.buttons["profile.settings"].waitForExistence(timeout: 10))
+        attach(app, name: "Profile photo after relaunch")
+    }
+    @MainActor func testMessagesPicturesAndChronologicalRows() throws {
+        continueAfterFailure = false
         let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
         app.tabBars.buttons.element(boundBy: 3).tap()
-        let signOut = app.buttons["Sign out"]
-        for _ in 0..<5 { if signOut.isHittable { break }; app.swipeUp() }
-        XCTAssertTrue(signOut.waitForExistence(timeout: 5)); signOut.tap()
-        XCTAssertTrue(app.buttons["Create an account with email"].waitForExistence(timeout: 10), app.debugDescription)
+        let newest = try XCTUnwrap(Bundle(for: Self.self).object(forInfoDictionaryKey: "PLUM_QA_FRIEND_NAME") as? String)
+        let older = newest.replacingOccurrences(of: "_c_", with: "_b_")
+        let unmessaged = newest.replacingOccurrences(of: "_c_", with: "_d_")
+        let first = app.staticTexts[newest].firstMatch
+        let second = app.staticTexts[older].firstMatch
+        let third = app.staticTexts[unmessaged].firstMatch
+        XCTAssertTrue(first.waitForExistence(timeout: 12), app.debugDescription)
+        XCTAssertTrue(second.exists); XCTAssertTrue(third.exists)
+        XCTAssertLessThan(first.frame.minY, second.frame.minY)
+        XCTAssertLessThan(second.frame.minY, third.frame.minY)
+        attach(app, name: "Friend photos and chronological messages")
+    }
+    @MainActor func testZSignOutLeavesWelcomeReady() throws {
+        let app = XCUIApplication(); app.launch(); try signInIfNeeded(app)
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 15))
+        try signOutFromProfile(app)
         attach(app, name: "Signed out and ready for user")
     }
     @MainActor private func signInIfNeeded(_ app: XCUIApplication) throws {
@@ -165,7 +239,8 @@ final class PlumFlowTests: XCTestCase {
         }
     }
     @MainActor private func signOutFromProfile(_ app: XCUIApplication) throws {
-        app.tabBars.buttons.element(boundBy: 3).tap()
+        app.tabBars.buttons.element(boundBy: 4).tap()
+        if app.buttons["profile.settings"].waitForExistence(timeout: 8) { app.buttons["profile.settings"].tap() }
         let signOut = app.buttons["Sign out"]
         for _ in 0..<6 { if signOut.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(signOut.waitForExistence(timeout: 5), app.debugDescription)

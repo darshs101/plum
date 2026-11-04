@@ -91,6 +91,7 @@ Both public and private account owners can remove followers. No blocking or muti
 
 Profile pages include:
 
+- An uploaded profile picture, with an initial/avatar fallback when absent.
 - Username/profile identity and follower/following counts subject to privacy permissions
 - A chronological visual grid of reviews/posts
 - Public collections
@@ -125,6 +126,8 @@ Users who can view a post can like and comment on it.
 
 Messaging is limited to one-to-one conversations between mutual followers. Users can send text and share Plum posts. Photo uploads, group chats, and blocking are out of scope for v1.
 
+The Messages tab lists all mutual approved friends, including friends without an existing conversation. Show their profile pictures and latest message preview. Sort conversations by latest message descending, followed by friends without messages ordered by their most recent mutual follow.
+
 ## Discovery
 
 ### Home
@@ -152,9 +155,12 @@ Use a simple bottom tab bar with icons only:
 1. Home — home icon
 2. Explore — search icon
 3. Create — plus icon
-4. Profile — person icon
+4. Messages — paperplane icon
+5. Profile — person icon
 
-The Profile tab has a bell button in its upper-right corner that opens Notifications.
+The Profile tab has a bell button in its upper-right corner that opens Notifications and a gear button in its upper-left corner that opens Settings. Settings contains Edit profile (including profile photo upload), Enable notifications, and Sign out. The profile body does not show these actions or a Connections & messages button.
+
+Notifications are one chronological row list with actor pictures, readable activity text, and time. Follow request approval/deletion is inline in its notification row; there is no separate Manage follow requests section. Collection rows show numbered restaurant names, including the restaurant and dish summary for a saved tasting, while a saved tasting still opens that individual post.
 
 Push notifications in v1:
 

@@ -2,11 +2,6 @@ import Supabase
 
 import SwiftUI
 
-struct SocialActionsView: View {
-    var body: some View {
-        List { NavigationLink("Follow requests & followers") { FollowManagementView() }; NavigationLink("Direct messages") { MessagesInboxView() } }.navigationTitle("Connections")
-    }
-}
 struct FollowManagementView: View {
     @State private var follows: [LiveFollow] = []; @State private var outgoing: [LiveFollow] = []; @State private var names: [UUID: String] = [:]; @State private var me: UUID?; @State private var error: String?; @State private var workingID: UUID?
     var body: some View {
@@ -32,40 +27,131 @@ struct FollowManagementView: View {
     private func remove(_ follow: LiveFollow) { workingID = follow.follower_id; error = nil; Task { defer { workingID = nil }; do { try await PlumAPI.unfollow(follower: follow.follower_id, following: follow.following_id); await load() } catch { self.error = error.localizedDescription } } }
 }
 struct LiveNotificationsView: View {
-    @State private var rows: [LiveNotification] = []; @State private var actorNames: [UUID: String] = [:]; @State private var error: String?; @State private var loading = true
+    @State private var rows: [LiveNotification] = []
+    @State private var actors: [UUID: LiveProfile] = [:]
+    @State private var pending: Set<UUID> = []
+    @State private var requestDates: [UUID: Date] = [:]
+    @State private var handled: [UUID: String] = [:]
+    @State private var error: String?
+    @State private var loading = true
+    @State private var canLoadMore = false
+    @State private var working: UUID?
     var body: some View {
         List {
-            NavigationLink("Manage follow requests") { FollowManagementView() }
-            if loading { ProgressView() }
-            if let error { Text(error).foregroundStyle(.red) }
-            if !loading && rows.isEmpty { Text("You’re all caught up.") }
+            if loading && rows.isEmpty { ProgressView("Loading notifications…") }
+            if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
+            if !loading && error == nil && rows.isEmpty { ContentUnavailableView("You’re all caught up", systemImage: "bell", description: Text("Likes, comments, and follow activity will appear here.")) }
             ForEach(rows) { row in
-                VStack(alignment: .leading) {
-                    let copy = "\(row.actor_id.flatMap { actorNames[$0] }.map { "@\($0) " } ?? "")\(row.kind.replacingOccurrences(of: "_", with: " ").capitalized)"
-                    if let postID = row.post_id { NavigationLink(copy) { PostDetailView(id: postID) } }
-                    else if let actorID = row.actor_id { NavigationLink(copy) { MemberProfileView(id: actorID) } }
-                    else { Text(copy) }
-                    Text(row.created_at, style: .relative).font(.caption).foregroundStyle(.secondary)
-                }.fontWeight(row.read_at == nil ? .semibold : .regular)
+                HStack(alignment: .top, spacing: 12) {
+                    ProfileAvatar(path: row.actor_id.flatMap { actors[$0]?.avatar_path }, name: row.actor_id.flatMap { actors[$0]?.display_name } ?? "", size: 44)
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let postID = row.post_id { NavigationLink { PostDetailView(id: postID) } label: { notificationText(row) }.buttonStyle(.plain) }
+                    else if let actorID = row.actor_id { NavigationLink { MemberProfileView(id: actorID, notificationIdentity: actors[actorID]) } label: { notificationText(row) }.buttonStyle(.plain) }
+                        else { notificationText(row) }
+                        if row.kind == "follow_request", let actor = row.actor_id, pending.contains(actor), requestDates[actor].map({ row.created_at >= $0 }) ?? true {
+                            HStack {
+                                Button("Confirm") { respond(actor, notificationID: row.id, approve: true) }.buttonStyle(.borderedProminent).tint(.plum)
+                                Button("Delete") { respond(actor, notificationID: row.id, approve: false) }.buttonStyle(.bordered)
+                            }.disabled(working != nil)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }.padding(.vertical, 6)
             }
-        }.navigationTitle("Notifications").task { await load() }.refreshable { await load() }
+            if canLoadMore { Button("Load more notifications") { Task { await load(more: true) } }.disabled(loading) }
+        }.listStyle(.plain).navigationTitle("Notifications").task { await load() }.refreshable { await load() }
     }
-    private func load() async { loading = true; defer { loading = false }; do { rows = try await PlumAPI.client.from("notifications").select().order("created_at", ascending: false).limit(100).execute().value; for actor in Set(rows.compactMap(\.actor_id)) { actorNames[actor] = (try? await PlumAPI.profile(actor))?.username ?? "Plum member" }; let unread = rows.filter { $0.read_at == nil }.map(\.id); if !unread.isEmpty { _ = try await PlumAPI.client.from("notifications").update(["read_at":ISO8601DateFormatter().string(from: .now)]).in("id", values: unread).execute(); let now = Date(); rows = rows.map { var item = $0; if item.read_at == nil { item = LiveNotification(id: item.id, kind: item.kind, actor_id: item.actor_id, post_id: item.post_id, created_at: item.created_at, read_at: now) }; return item } } } catch { self.error = error.localizedDescription } }
+    private func notificationText(_ row: LiveNotification) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            (Text(row.actor_id.flatMap { actors[$0]?.username }.map { "@\($0) " } ?? "Someone ").fontWeight(.semibold) + Text(copy(row))).foregroundStyle(.primary)
+            Text(row.created_at, style: .relative).font(.caption).foregroundStyle(.secondary)
+        }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+    private func copy(_ row: LiveNotification) -> String {
+        if row.kind == "follow_request", let result = handled[row.id] { return result }
+        switch row.kind {
+        case "like": return "liked your tasting."
+        case "comment": return "commented on your tasting."
+        case "reply": return "replied to your comment."
+        case "follow": return "started following you."
+        case "follow_request": return "requested to follow you."
+        case "follow_approval": return "accepted your follow request."
+        default: return "shared new activity."
+        }
+    }
+    private func respond(_ actor: UUID, notificationID: UUID, approve: Bool) {
+        guard working == nil else { return }; working = actor
+        Task { defer { working = nil }; do {
+            let me = try await PlumAPI.userID()
+            if approve { _ = try await PlumAPI.client.from("follows").update(["status":"approved"]).eq("follower_id", value: actor).eq("following_id", value: me).eq("status", value: "requested").execute() }
+            else { try await PlumAPI.unfollow(follower: actor, following: me) }
+            pending.remove(actor); handled[notificationID] = approve ? "is now following you." : "had their follow request deleted."
+        } catch { self.error = error.localizedDescription } }
+    }
+    private func load(more: Bool = false) async {
+        guard !more || !loading else { return }; loading = true; error = nil; defer { loading = false }
+        do {
+            let me = try await PlumAPI.userID()
+            let people: [LiveProfile] = try await PlumAPI.client.rpc("notification_actor_profiles").execute().value
+            actors = Dictionary(uniqueKeysWithValues: people.map { ($0.id, $0) })
+            let requests: [LiveFollow] = try await PlumAPI.client.from("follows").select().eq("following_id", value: me).eq("status", value: "requested").execute().value
+            pending = Set(requests.map(\.follower_id))
+            requestDates = Dictionary(uniqueKeysWithValues: requests.compactMap { request in request.created_at.map { (request.follower_id, $0) } })
+            let offset = more ? rows.count : 0
+            let next: [LiveNotification] = try await PlumAPI.client.from("notifications").select().order("created_at", ascending: false).order("id").range(from: offset, to: offset + 99).execute().value
+            rows = more ? rows + next : next; canLoadMore = next.count == 100
+            let unread = next.filter { $0.read_at == nil }.map(\.id)
+            if !unread.isEmpty { _ = try await PlumAPI.client.from("notifications").update(["read_at":ISO8601DateFormatter().string(from: .now)]).in("id", values: unread).execute() }
+        } catch { self.error = error.localizedDescription }
+    }
 }
+
 struct MessagesInboxView: View {
-    @State private var rows: [LiveConversation] = []; @State private var me: UUID?; @State private var names: [UUID: String] = [:]; @State private var error: String?; @State private var loading = true
+    @State private var friends: [LiveInboxFriend] = []
+    @State private var error: String?
+    @State private var loading = true
+    @State private var connectionGeneration = 0
+    @Environment(\.scenePhase) private var scenePhase
     var body: some View {
         List {
-            if loading { ProgressView("Loading messages…") }
-            if let error { VStack(alignment: .leading) { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } } }
-            if !loading && error == nil && rows.isEmpty { Text("Open a mutual follower’s profile and tap Message to start a conversation.") }
-            ForEach(rows) { row in if let other = row.direct_key.split(separator: ":").compactMap({ UUID(uuidString: String($0)) }).first(where: { $0 != me }) { NavigationLink(names[other] ?? "Conversation") { ConversationView(otherUser: other) } } }
-        }.navigationTitle("Messages").task { await load() }.refreshable { await load() }
+            if loading && friends.isEmpty { ProgressView("Loading messages…") }
+            if let error { Text(error).foregroundStyle(.red); Button("Retry") { connectionGeneration += 1; Task { await load() } } }
+            if !loading && error == nil && friends.isEmpty { ContentUnavailableView("Messages with friends", systemImage: "paperplane", description: Text("Follow each other to start a conversation. Your friends will appear here.")) }
+            ForEach(friends) { friend in
+                NavigationLink { ConversationView(otherUser: friend.id, otherName: friend.display_name) } label: {
+                    HStack(spacing: 12) {
+                        ProfileAvatar(path: friend.avatar_path, name: friend.display_name, size: 54)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack { Text(friend.display_name).fontWeight(.semibold); Spacer(); if let date = friend.last_message_at { Text(date, style: .relative).font(.caption).foregroundStyle(.secondary) } }
+                            Text(friend.last_message ?? "Say hello to @\(friend.username)").font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                    }.padding(.vertical, 6)
+                }
+            }
+        }.listStyle(.plain).navigationTitle("Messages").task { await load() }.refreshable { await load() }
+            .task(id: connectionGeneration) {
+                do {
+                    let me = try await PlumAPI.userID()
+                    let realtime = try PlumAPI.client.realtimeV2
+                    let channel = realtime.channel("inbox-\(me)")
+                    defer { Task { await realtime.removeChannel(channel) } }
+                    let changes = channel.postgresChange(AnyAction.self, schema: "public", table: "messages")
+                    try await channel.subscribeWithError()
+                    for await _ in changes { await load() }
+                } catch { if !Task.isCancelled { self.error = error.localizedDescription } }
+            }
+            .onChange(of: scenePhase) { _, phase in if phase == .active { connectionGeneration += 1; Task { await load() } } }
     }
-    private func load() async { loading = true; error = nil; defer { loading = false }; do { me = try await PlumAPI.userID(); rows = try await PlumAPI.client.from("conversations").select().order("created_at", ascending: false).execute().value; names = [:]; for row in rows { for id in row.direct_key.split(separator: ":").compactMap({ UUID(uuidString: String($0)) }) where id != me { names[id] = try await PlumAPI.profile(id).username } } } catch { self.error = error.localizedDescription } }
+    private func load() async {
+        loading = true; error = nil; defer { loading = false }
+        do { friends = try await PlumAPI.client.rpc("friends_inbox").execute().value }
+        catch { self.error = error.localizedDescription }
+    }
 }
+
 struct ConversationView: View {
     let otherUser: UUID
+    var otherName: String? = nil
     var sharedPost: UUID? = nil
     @State private var conversation: UUID?
     @State private var messages: [LiveMessage] = []
@@ -91,7 +177,7 @@ struct ConversationView: View {
             }.padding() }
             if sharedPost != nil && !shared { Button("Share this tasting") { send(share: true) }.buttonStyle(.bordered).disabled(conversation == nil || working) }
             HStack { TextField("Message", text: $text).textFieldStyle(.roundedBorder).accessibilityIdentifier("dm.message"); Button("Send") { send(share: false) }.accessibilityIdentifier("dm.send").disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || conversation == nil || working) }.padding()
-        }.navigationTitle("Conversation").navigationBarTitleDisplayMode(.inline)
+        }.navigationTitle(otherName ?? "Conversation").navigationBarTitleDisplayMode(.inline)
             .task {
                 do { me = try await PlumAPI.userID(); conversation = try await PlumAPI.client.rpc("start_direct_conversation", params: ["other_user":otherUser.uuidString]).execute().value; await load() }
                 catch { self.error = error.localizedDescription }
