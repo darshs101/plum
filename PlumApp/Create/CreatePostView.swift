@@ -85,6 +85,7 @@ struct CreatePostView: View {
                     } else {
                         TextField("Search restaurants", text: $restaurantQuery)
                             .textInputAutocapitalization(.words)
+                            .accessibilityIdentifier("composer.restaurantSearch")
                     }
                 }
                 .padding(14)
@@ -167,7 +168,20 @@ struct CreatePostView: View {
                     .background(.background, in: RoundedRectangle(cornerRadius: PlumStyle.cornerRadius))
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("composer.photoPicker")
                 if photoCount > 0 { Text("\(photoCount) photos selected").font(.caption) }
+                if !store.photos.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(store.photos) { photo in
+                                ZStack(alignment: .topTrailing) {
+                                    if let image = UIImage(data: photo.data) { Image(uiImage: image).resizable().scaledToFill().frame(width: 88, height: 88).clipShape(RoundedRectangle(cornerRadius: 10)) }
+                                    Button { removePhoto(photo.id) } label: { Image(systemName: "xmark.circle.fill").symbolRenderingMode(.palette).foregroundStyle(.white, .plum).font(.title3) }.accessibilityLabel("Remove photo").accessibilityIdentifier("composer.removePhoto")
+                                }
+                            }
+                        }
+                    }
+                }
                 if photoCount == 0 {
                     Label("At least one photo is needed to post.", systemImage: "info.circle")
                         .font(.caption)
@@ -208,6 +222,7 @@ struct CreatePostView: View {
         .foregroundStyle(.white)
         .background(canPost ? Color.plum : Color.gray.opacity(0.45), in: RoundedRectangle(cornerRadius: 14))
         .disabled(!canPost || store.isWorking)
+        .accessibilityIdentifier("composer.publish")
         .accessibilityHint(canPost ? "Publishes your tasting" : "Choose a restaurant, add a dish, and attach a photo to post")
     }
 
@@ -259,6 +274,11 @@ struct CreatePostView: View {
         await store.publish()
         if store.success { didPost = true }
     }
+    private func removePhoto(_ id: UUID) {
+        store.photos.removeAll { $0.id == id }
+        pickerItems = []
+        photoCount = store.photos.count
+    }
 }
 
 private struct DishEditor: View {
@@ -285,6 +305,7 @@ private struct DishEditor: View {
                 .onChange(of: dish.name) { _, newValue in if !suggestions.contains(where: { $0.id == dish.dishID && $0.title == newValue }) { dish.dishID = nil }; onSearch() }
                 .padding(12)
                 .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+                .accessibilityIdentifier("composer.dishName")
             if !suggestions.isEmpty {
                 FlowLayout(spacing: 8) {
                     ForEach(suggestions.prefix(4)) { result in

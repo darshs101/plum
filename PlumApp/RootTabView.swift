@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct RootTabView: View {
-    @State private var openedPost: OpenedPost?
-    private struct OpenedPost: Identifiable { let id: UUID }
+    @ObservedObject private var navigation = AppNavigation.shared
+    @State private var openedRoute: NotificationRoute?
     @State private var selection: AppTab
 
     init() {
@@ -23,8 +23,24 @@ struct RootTabView: View {
             ProfileView().tabItem { Image(systemName: "person").accessibilityLabel("Profile") }.tag(AppTab.profile)
         }
         .tint(.plum)
-        .onReceive(NotificationCenter.default.publisher(for: .plumOpenPost)) { notification in if let id = notification.object as? UUID { openedPost = OpenedPost(id: id) } }
-        .sheet(item: $openedPost) { post in NavigationStack { PostDetailView(id: post.id) } }
+        .task(id: navigation.pendingNotification) {
+            guard let route = navigation.pendingNotification else { return }
+            guard let me = try? await PlumAPI.userID() else { return }
+            navigation.pendingNotification = nil
+            guard route.recipientID == nil || route.recipientID == me else { return }
+            openedRoute = route
+        }
+        .sheet(item: $openedRoute) { route in
+            NavigationStack {
+                Group {
+                    switch route.destination {
+                    case .post: if let id = route.targetID { PostDetailView(id: id) }
+                    case .profile: if let id = route.targetID { MemberProfileView(id: id) }
+                    case .requests: FollowManagementView()
+                    }
+                }.toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { openedRoute = nil } } }
+            }
+        }
     }
 }
 

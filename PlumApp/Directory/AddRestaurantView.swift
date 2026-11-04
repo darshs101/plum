@@ -18,18 +18,18 @@ struct AddRestaurantView: View {
         NavigationStack {
             Form {
                 Section("One physical location") {
-                    TextField("Restaurant name", text: $name)
-                    TextField("Street address, city, state", text: $address)
+                    TextField("Restaurant name", text: $name).accessibilityIdentifier("restaurant.name")
+                    TextField("Street address, city, state", text: $address).accessibilityIdentifier("restaurant.address")
                     TextField("Neighborhood (optional)", text: $neighborhood)
                     TextField("Cuisine (optional)", text: $cuisine)
                     Picker("Price", selection: $price) { ForEach(1...4, id: \.self) { Text(String(repeating: "$", count: $0)).tag($0) } }
                 }
                 Section("Location photo (required)") {
-                    PhotosPicker(selection: $photo, matching: .images) { Label("Choose or change photo", systemImage: "photo") }
+                    PhotosPicker(selection: $photo, matching: .images) { Label("Choose or change photo", systemImage: "photo") }.accessibilityIdentifier("restaurant.photoPicker")
                     if let data, let image = UIImage(data: data) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180) }
                 }
                 if let error { Text(error).foregroundStyle(.red) }
-                Button("Add restaurant") { Task { await save() } }.disabled(working || data == nil || name.trimmingCharacters(in: .whitespaces).isEmpty || address.trimmingCharacters(in: .whitespaces).isEmpty)
+                Button("Add restaurant") { Task { await save() } }.disabled(working || data == nil || name.trimmingCharacters(in: .whitespaces).isEmpty || address.trimmingCharacters(in: .whitespaces).isEmpty).accessibilityIdentifier("restaurant.submit")
                 if working { ProgressView("Saving location…") }
             }.navigationTitle("Add restaurant")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(working) } }

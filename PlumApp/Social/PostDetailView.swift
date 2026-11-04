@@ -25,29 +25,29 @@ struct PostDetailView: View {
                 if loading { ProgressView("Loading post…") }
                 if let error { Text(error).foregroundStyle(.red); Button("Retry") { Task { await load() } } }
                 if let post {
-                    LivePostCard(post: post)
+                    LivePostContent(post: post)
                     HStack(spacing: 22) {
-                        Button { action { try await PlumServices.social.setLike(postID: id, isLiked: !liked); liked.toggle(); likes += liked ? 1 : -1 } } label: { Label("\(likes)", systemImage: liked ? "heart.fill" : "heart") }
-                        Button { saving = true } label: { Image(systemName: "bookmark") }.accessibilityLabel("Add to collection")
+                        Button { action { try await PlumServices.social.setLike(postID: id, isLiked: !liked); liked.toggle(); likes += liked ? 1 : -1 } } label: { Label("\(likes)", systemImage: liked ? "heart.fill" : "heart") }.accessibilityIdentifier("post.like")
+                        Button { saving = true } label: { Image(systemName: "bookmark") }.accessibilityLabel("Add to collection").accessibilityIdentifier("post.actions")
                         Button { sharing = true } label: { Image(systemName: "paperplane") }.accessibilityLabel("Share in message")
                         Spacer()
                         Menu {
                             ForEach(Array(post.post_photos.enumerated()), id: \.element.id) { index, photo in Button("Report photo \(index + 1)") { reportedPhoto = photo } }
                             Button("Report post", role: .destructive) { reporting = true }
                             if me == post.author_id { Button("Edit post") { editing = true }; Button("Delete post", role: .destructive) { deleting = true } }
-                        } label: { Image(systemName: "ellipsis") }
+                        } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Post options").accessibilityIdentifier("post.options")
                     }.disabled(working)
                     Text("Comments").font(.headline)
                     ForEach(comments) { comment in commentRow(comment, post: post) }
                     if comments.isEmpty { Text("Start the conversation.").foregroundStyle(.secondary) }
                     if let replyTo { HStack { Text("Replying to @\(replyTo.profiles?.username ?? "member")").font(.caption); Button("Cancel") { self.replyTo = nil } } }
-                    TextField("Add a comment", text: $bodyText, axis: .vertical).textFieldStyle(.roundedBorder)
+                    TextField("Add a comment", text: $bodyText, axis: .vertical).textFieldStyle(.roundedBorder).accessibilityIdentifier("post.comment")
                     Button("Send comment") { action {
                         guard let me else { return }
                         struct NewComment: Encodable { let post_id: UUID; let author_id: UUID; let body: String; let parent_id: UUID? }
                         _ = try await PlumAPI.client.from("comments").insert(NewComment(post_id: id, author_id: me, body: bodyText.trimmingCharacters(in: .whitespacesAndNewlines), parent_id: replyTo?.id)).execute()
                         bodyText = ""; replyTo = nil; await load()
-                    } }.disabled(working || bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    } }.accessibilityIdentifier("post.sendComment").disabled(working || bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }.padding(18)
         }.navigationTitle("Tasting").navigationBarTitleDisplayMode(.inline).task { await load() }.refreshable { await load() }
@@ -88,7 +88,7 @@ struct ReportContentView: View {
     var body: some View {
         NavigationStack { Form {
             if sent { Label("Report received for review", systemImage: "checkmark.circle") }
-            else { TextField("What happened?", text: $reason, axis: .vertical); if let error { Text(error).foregroundStyle(.red) }; Button("Submit report") { working = true; Task { defer { working = false }; do { try await PlumAPI.report(type: type, id: id, reason: reason); sent = true } catch { self.error = error.localizedDescription } } }.disabled(reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || working) }
+            else { TextField("What happened?", text: $reason, axis: .vertical).accessibilityIdentifier("report.reason"); if let error { Text(error).foregroundStyle(.red) }; Button("Submit report") { working = true; Task { defer { working = false }; do { try await PlumAPI.report(type: type, id: id, reason: reason); sent = true } catch { self.error = error.localizedDescription } } }.accessibilityIdentifier("report.submit").disabled(reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || working) }
         }.navigationTitle("Report \(type)").toolbar { Button("Done") { dismiss() } } }
     }
 }

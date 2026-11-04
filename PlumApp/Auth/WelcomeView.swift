@@ -34,18 +34,18 @@ struct WelcomeView: View {
             Button { run { try await session.signInWithGoogle() } } label: {
                 Label("Continue with Google", systemImage: "g.circle.fill").frame(maxWidth: .infinity)
             }.buttonStyle(.bordered).tint(.plum).disabled(working)
-            Button("Create an account with email") { creatingAccount = true; showEmail = true }.frame(maxWidth: .infinity)
-            Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity)
+            Button("Create an account with email") { creatingAccount = true; showEmail = true }.frame(maxWidth: .infinity).disabled(working)
+            Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity).disabled(working)
             if working { ProgressView("Signing in…").frame(maxWidth: .infinity) }
             Spacer()
         }.padding(24)
     }
-    private var validUsername: Bool { username.range(of: "^[a-z0-9_]{3,30}$", options: .regularExpression) != nil }
+    private var validUsername: Bool { username.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().range(of: "^[a-z0-9_]{3,30}$", options: .regularExpression) != nil }
     private var emailForm: some View {
         Form {
             if confirmationPending {
                 Section("Confirm your email") {
-                    Text("Your account was created. Supabase currently requires email confirmation. Open the link sent to \(email), then return here and sign in. If the email contains a code, enter it below.")
+                    Text("Your account was created. Open the confirmation link sent to \(email), then return here and sign in. If the email contains a code, enter it below.")
                     TextField("Confirmation code", text: $code).keyboardType(.numberPad).textContentType(.oneTimeCode)
                     Button("Confirm code") { run { try await session.verifyEmail(email: email, code: code) } }.disabled(working || code.isEmpty)
                     Button("Return to sign in") { confirmationPending = false; creatingAccount = false }
@@ -57,7 +57,7 @@ struct WelcomeView: View {
                         TextField("Username", text: $username).textInputAutocapitalization(.never).autocorrectionDisabled().textContentType(.username).accessibilityIdentifier("auth.username")
                         Text("3–30 lowercase letters, numbers, or underscores.").font(.caption).foregroundStyle(.secondary)
                     }
-                    SecureField("Password", text: $password).textContentType(creatingAccount ? .newPassword : .password).accessibilityIdentifier("auth.password")
+                    SecureField("Password", text: $password).textContentType(.password).accessibilityIdentifier("auth.password")
                     if creatingAccount { Text("Use at least 8 characters.").font(.caption).foregroundStyle(.secondary) }
                 }
                 Section {
@@ -73,7 +73,7 @@ struct WelcomeView: View {
             if working { ProgressView("Please wait…") }
         }
         .scrollContentBackground(.hidden)
-        .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Back") { showEmail = false } } }
+        .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Back") { showEmail = false }.disabled(working) } }
     }
     private func run(_ action: @escaping @MainActor () async throws -> Void) {
         guard !working else { return }

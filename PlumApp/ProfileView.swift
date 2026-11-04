@@ -71,6 +71,7 @@ struct MemberProfileView: View {
             .sheet(isPresented: $editing) { editSheet }
             .sheet(isPresented: $newCollection, onDismiss: { Task { await load() } }) { NewCollectionView() }
             .sheet(isPresented: $reporting) { if let profile { ReportContentView(type: "account", id: profile.id) } }
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("plumPushStatus"))) { note in notificationMessage = note.object as? String }
     }
     private func profileHeader(_ p: LiveProfile) -> some View {
         VStack(spacing: 10) {

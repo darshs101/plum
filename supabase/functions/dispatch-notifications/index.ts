@@ -28,7 +28,7 @@ Deno.serve(async request => {
   try {
     if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
     if (request.headers.get("Authorization") !== `Bearer ${env("PLUM_PUSH_WORKER_SECRET")}`) return new Response("Unauthorized", { status: 401 });
-    const pending = await database("notification_outbox?delivered_at=is.null&select=id,notifications(id,recipient_id,kind,post_id)&order=created_at&limit=100");
+    const pending = await database("notification_outbox?delivered_at=is.null&select=id,notifications(id,recipient_id,actor_id,kind,post_id)&order=created_at&limit=100");
     let delivered = 0;
     for (const row of pending) {
       const notification = row.notifications;
@@ -37,12 +37,12 @@ Deno.serve(async request => {
       let failed = false;
       for (const device of devices) {
         const response = await fetch(`https://${Deno.env.get("APNS_ENVIRONMENT") === "production" ? "api" : "api.sandbox"}.push.apple.com/3/device/${device.token}`, {
-          method: "POST", headers: { authorization: `bearer ${await apnsToken()}`, "apns-topic": env("APNS_BUNDLE_ID"), "apns-push-type": "alert", "apns-priority": "10" },
-          body: JSON.stringify({ aps: { alert: { title: "Plum", body: titles[notification.kind] ?? "New activity on Plum" }, sound: "default" }, post_id: notification.post_id, notification_id: notification.id }),
+          method: "POST", headers: { authorization: `bearer ${await apnsToken()}`, "apns-topic": env("APNS_BUNDLE_ID"), "apns-push-type": "alert", "apns-priority": "10", "apns-collapse-id": notification.id },
+          body: JSON.stringify({ aps: { alert: { title: "Plum", body: titles[notification.kind] ?? "New activity on Plum" }, sound: "default" }, post_id: notification.post_id, actor_id: notification.actor_id, recipient_id: notification.recipient_id, kind: notification.kind, notification_id: notification.id }),
         });
         if (!response.ok) {
           const error = await response.json();
-          if (response.status === 410 || error.reason === "BadDeviceToken") await database(`device_tokens?token=eq.${device.token}`, "DELETE");
+          if (response.status === 410) await database(`device_tokens?token=eq.${device.token}`, "DELETE");
           else failed = true;
         }
       }

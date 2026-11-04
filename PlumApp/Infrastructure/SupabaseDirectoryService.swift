@@ -37,6 +37,20 @@ actor SupabaseDirectoryService: DirectoryServing {
         return rows.sorted { left, right in (popular.firstIndex { $0.restaurant_id == left.id } ?? 999) < (popular.firstIndex { $0.restaurant_id == right.id } ?? 999) }.map { .init(id: $0.id, kind: .restaurant, title: $0.name, subtitle: $0.neighborhood ?? $0.address, priceLevel: $0.priceLevel, restaurantID: $0.id, isExactMatch: false) }
     }
 
+    func popularDishes() async throws -> [DirectoryResult] {
+        struct Aggregate: Decodable { let dish_id: UUID; let rating_count: Int }
+        let aggregates: [Aggregate] = try await client.from("public_dish_aggregates").select("dish_id,rating_count").order("rating_count", ascending: false).limit(20).execute().value
+        guard !aggregates.isEmpty else { return [] }
+        let rows: [DishRow] = try await client.from("dishes").select("id,name,restaurant_id").in("id", values: aggregates.map(\.dish_id)).execute().value
+        let restaurants: [RestaurantRow] = try await client.from("restaurants").select("id,name,address,neighborhood,price_level").in("id", values: rows.map(\.restaurantID)).execute().value
+        return rows.sorted { left, right in
+            (aggregates.firstIndex { $0.dish_id == left.id } ?? 999) < (aggregates.firstIndex { $0.dish_id == right.id } ?? 999)
+        }.compactMap { dish in
+            guard let restaurant = restaurants.first(where: { $0.id == dish.restaurantID }) else { return nil }
+            return .init(id: dish.id, kind: .dish, title: dish.name, subtitle: restaurant.name, priceLevel: restaurant.priceLevel, restaurantID: restaurant.id, isExactMatch: false)
+        }
+    }
+
     func createDish(restaurantID: UUID, name: String) async throws -> Dish {
         let user = try await client.auth.user()
         let row: DishRow = try await client.from("dishes").insert(NewDish(restaurantID: restaurantID, name: name, createdBy: user.id)).select().single().execute().value
@@ -51,7 +65,9 @@ actor SupabaseDirectoryService: DirectoryServing {
             guard let next = merges.first?.target_id else { break }; resolved = next
         }
         let row: FullRestaurant = try await client.from("restaurants").select().eq("id", value: resolved).single().execute().value
-        let url = try await client.storage.from("restaurant-media").createSignedURL(path: row.photo_path, expiresIn: 300)
+        // A missing or temporarily unavailable photo must not disable the shared
+        // location's dishes, activity, and collection actions.
+        let url = try? await client.storage.from("restaurant-media").createSignedURL(path: row.photo_path, expiresIn: 300)
         return Restaurant(id: row.id, name: row.name, neighborhood: row.neighborhood ?? "", address: row.address, cuisine: row.cuisine ?? "", priceLevel: row.price_level ?? 0, photoURL: url)
     }
     func createRestaurant(_ draft: RestaurantDraft) async throws -> Restaurant {
@@ -88,7 +104,8 @@ actor SupabaseDirectoryService: DirectoryServing {
             }
             let params = SavePostParams(post_uuid: postID, restaurant_uuid: draft.restaurantID,
                 dish_entries: draft.dishes.map { .init(dish_id: $0.dishID!, rating: $0.rating) },
-                photo_paths: paths, caption_text: draft.caption, visited_on: draft.visitDate.map { ISO8601DateFormatter().string(from: $0).prefix(10).description })
+                photo_paths: paths, caption_text: draft.caption, visited_on: draft.visitDate.map { ISO8601DateFormatter().string(from: $0).prefix(10).description },
+                photo_links: zip(paths, draft.photos).map { .init(photo_path: $0.0, dish_ids: Array($0.1.linkedDishIDs)) })
             _ = try await client.rpc("save_post", params: params).execute()
         } catch { if !paths.isEmpty { _ = try? await client.storage.from("post-media").remove(paths: paths + originalPaths) }; throw error }
     }
@@ -107,6 +124,26 @@ private struct NewPost: Encodable { let id, authorID, restaurantID: UUID; let ca
 private struct NewPostDish: Encodable { let postID, dishID: UUID; let rating: Double; enum CodingKeys: String, CodingKey { case rating; case postID = "post_id"; case dishID = "dish_id" } }
 private struct NewPostPhoto: Encodable { let postID: UUID; let storagePath: String; let position: Int; enum CodingKeys: String, CodingKey { case position; case postID = "post_id"; case storagePath = "storage_path" } }
 
-struct SavePostParams: Encodable { let post_uuid: UUID; let restaurant_uuid: UUID; let dish_entries: [SavePostDish]; let photo_paths: [String]; let caption_text: String?; let visited_on: String? }
+struct SavePostParams: Encodable {
+    let post_uuid: UUID
+    let restaurant_uuid: UUID
+    let dish_entries: [SavePostDish]
+    let photo_paths: [String]
+    let caption_text: String?
+    let visited_on: String?
+    let photo_links: [SavePostPhotoLink]
+    private enum CodingKeys: String, CodingKey { case post_uuid, restaurant_uuid, dish_entries, photo_paths, caption_text, visited_on, photo_links }
+    func encode(to encoder: Encoder) throws {
+        var values = encoder.container(keyedBy: CodingKeys.self)
+        try values.encode(post_uuid, forKey: .post_uuid)
+        try values.encode(restaurant_uuid, forKey: .restaurant_uuid)
+        try values.encode(dish_entries, forKey: .dish_entries)
+        try values.encode(photo_paths, forKey: .photo_paths)
+        if let caption_text { try values.encode(caption_text, forKey: .caption_text) } else { try values.encodeNil(forKey: .caption_text) }
+        if let visited_on { try values.encode(visited_on, forKey: .visited_on) } else { try values.encodeNil(forKey: .visited_on) }
+        try values.encode(photo_links, forKey: .photo_links)
+    }
+}
 struct SavePostDish: Encodable { let dish_id: UUID; let rating: Double }
+struct SavePostPhotoLink: Encodable { let photo_path: String; let dish_ids: [UUID] }
 private struct FullRestaurant: Codable { let id: UUID; let name: String; let address: String; let neighborhood: String?; let cuisine: String?; let price_level: Int?; let photo_path: String; let created_by: UUID }

@@ -13,6 +13,7 @@ protocol DirectoryServing: Sendable {
     func search(query: String, filters: DirectoryFilters) async throws -> [DirectoryResult]
     func curatedCollections() async throws -> [DirectoryResult]
     func popularNearby() async throws -> [DirectoryResult]
+    func popularDishes() async throws -> [DirectoryResult]
     func restaurant(id: UUID) async throws -> Restaurant
     func createRestaurant(_ draft: RestaurantDraft) async throws -> Restaurant
     func createDish(restaurantID: UUID, name: String) async throws -> Dish
@@ -23,6 +24,7 @@ struct UnconfiguredDirectoryService: DirectoryServing {
     func search(query: String, filters: DirectoryFilters) async throws -> [DirectoryResult] { throw PlumError.unavailable }
     func curatedCollections() async throws -> [DirectoryResult] { throw PlumError.unavailable }
     func popularNearby() async throws -> [DirectoryResult] { throw PlumError.unavailable }
+    func popularDishes() async throws -> [DirectoryResult] { throw PlumError.unavailable }
     func restaurant(id: UUID) async throws -> Restaurant { throw PlumError.unavailable }
     func createRestaurant(_ draft: RestaurantDraft) async throws -> Restaurant { throw PlumError.unavailable }
     func createDish(restaurantID: UUID, name: String) async throws -> Dish { throw PlumError.unavailable }
@@ -32,9 +34,9 @@ struct UnconfiguredDirectoryService: DirectoryServing {
 
 @MainActor @Observable final class ExploreStore {
     private let service: any DirectoryServing
-    var query = ""; var filters = DirectoryFilters(); var results: [DirectoryResult] = []; var curated: [DirectoryResult] = []; var popular: [DirectoryResult] = []; var isLoading = false; var error: String?
+    var query = ""; var filters = DirectoryFilters(); var results: [DirectoryResult] = []; var curated: [DirectoryResult] = []; var popular: [DirectoryResult] = []; var popularDishes: [DirectoryResult] = []; var isLoading = false; var error: String?
     init(service: any DirectoryServing = UnconfiguredDirectoryService()) { self.service = service }
-    func loadLanding() async { isLoading = true; error = nil; do { async let a = service.curatedCollections(); async let b = service.popularNearby(); curated = try await a; popular = try await b } catch { if !Task.isCancelled { self.error = error.localizedDescription } }; isLoading = false }
+    func loadLanding() async { isLoading = true; error = nil; do { async let a = service.curatedCollections(); async let b = service.popularNearby(); async let c = service.popularDishes(); curated = try await a; popular = try await b; popularDishes = try await c } catch { if !Task.isCancelled { self.error = error.localizedDescription } }; isLoading = false }
     private var searchGeneration = UUID()
     func search() async {
         let generation = UUID(); searchGeneration = generation
@@ -83,6 +85,6 @@ struct UnconfiguredDirectoryService: DirectoryServing {
             dishSuggestions[id] = found
         } catch { if !Task.isCancelled && dishGenerations[id] == generation { self.error = error.localizedDescription } }
     }
-    func publish() async { guard canPost, let restaurantID = selectedRestaurant?.id else { error = PlumError.invalidPost.errorDescription; return }; isWorking = true; error = nil; success = false; do { var resolved = dishes; for index in resolved.indices where resolved[index].dishID == nil { let dish = try await service.createDish(restaurantID: restaurantID, name: resolved[index].proposedName); resolved[index].dishID = dish.id }; try await service.createPost(.init(restaurantID: restaurantID, dishes: resolved, photos: photos, caption: caption.isEmpty ? nil : caption, visitDate: includesVisitDate ? visitDate : nil)); success = true } catch { self.error = error.localizedDescription }; isWorking = false }
+    func publish() async { guard canPost, let restaurantID = selectedRestaurant?.id else { error = PlumError.invalidPost.errorDescription; return }; isWorking = true; error = nil; success = false; do { var resolved = dishes; for index in resolved.indices where resolved[index].dishID == nil { let dish = try await service.createDish(restaurantID: restaurantID, name: resolved[index].proposedName); resolved[index].dishID = dish.id }; let dishIDs = Set(resolved.compactMap(\.dishID)); let mappedPhotos = photos.map { photo in var mapped = photo; if mapped.linkedDishIDs.isEmpty { mapped.linkedDishIDs = dishIDs }; return mapped }; try await service.createPost(.init(restaurantID: restaurantID, dishes: resolved, photos: mappedPhotos, caption: caption.isEmpty ? nil : caption, visitDate: includesVisitDate ? visitDate : nil)); success = true } catch { self.error = error.localizedDescription }; isWorking = false }
     func reset() { restaurantQuery = ""; restaurantResults = []; selectedRestaurant = nil; dishes = [.init(id: UUID(), dishID: nil, proposedName: "", rating: 4.5)]; dishSuggestions = [:]; photos = []; caption = ""; includesVisitDate = false; visitDate = .now; success = false }
 }

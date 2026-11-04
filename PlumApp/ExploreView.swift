@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExploreView: View {
     @State private var store = ExploreStore(service: PlumServices.directory)
+    @State private var showingFilters = false
 
     var body: some View {
         NavigationStack {
@@ -16,7 +17,11 @@ struct ExploreView: View {
             }
             .background(PlumStyle.cream.ignoresSafeArea())
             .navigationTitle("Explore").navigationBarTitleDisplayMode(.inline)
-            .toolbar { NavigationLink { AddRestaurantView { _ in Task { await store.loadLanding() } } } label: { Image(systemName: "plus") }.accessibilityLabel("Add restaurant") }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { Button { showingFilters = true } label: { Image(systemName: "line.3.horizontal.decrease.circle") }.accessibilityLabel("Directory filters").accessibilityIdentifier("directory.filters") }
+                ToolbarItem(placement: .topBarTrailing) { NavigationLink { AddRestaurantView { _ in Task { await store.loadLanding() } } } label: { Image(systemName: "plus") }.accessibilityLabel("Add restaurant").accessibilityIdentifier("directory.addRestaurant") }
+            }
+            .sheet(isPresented: $showingFilters) { DirectoryFiltersView(filters: $store.filters) }
             .refreshable { await store.loadLanding(); await store.search() }
             .task { await store.loadLanding() }
             .task(id: searchKey) { await store.search() }
@@ -41,10 +46,10 @@ struct ExploreView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 9) {
                 filterButton("All", store.filters == .init()) { store.filters = .init() }
-                filterButton("Italian", store.filters.cuisine == "Italian") { store.filters.cuisine = store.filters.cuisine == "Italian" ? nil : "Italian" }
-                filterButton("Old Fourth Ward", store.filters.neighborhood == "Old Fourth Ward") { store.filters.neighborhood = store.filters.neighborhood == "Old Fourth Ward" ? nil : "Old Fourth Ward" }
-                filterButton("$$", store.filters.priceLevel == 2) { store.filters.priceLevel = store.filters.priceLevel == 2 ? nil : 2 }
-                filterButton("$$$", store.filters.priceLevel == 3) { store.filters.priceLevel = store.filters.priceLevel == 3 ? nil : 3 }
+                if let cuisine = store.filters.cuisine { filterButton(cuisine, true) { store.filters.cuisine = nil } }
+                if let neighborhood = store.filters.neighborhood { filterButton(neighborhood, true) { store.filters.neighborhood = nil } }
+                if let price = store.filters.priceLevel { filterButton(String(repeating: "$", count: price), true) { store.filters.priceLevel = nil } }
+                Button("More filters") { showingFilters = true }.font(.subheadline.weight(.semibold)).foregroundStyle(.plum).padding(.horizontal, 15).padding(.vertical, 9).background(.white.opacity(0.62), in: Capsule())
             }
         }
     }
@@ -55,7 +60,7 @@ struct ExploreView: View {
         if store.isLoading { ProgressView("Finding tables…").frame(maxWidth: .infinity).padding(.vertical, 44) }
         else if let error = store.error { errorState(error) }
         else if !store.query.isEmpty || store.filters != .init() { resultSection("BEST MATCHES", store.results) }
-        else { resultSection("CURATED FOR A GOOD NIGHT", store.curated); resultSection("ON EVERYONE'S LIST", store.popular) }
+        else { resultSection("CURATED FOR A GOOD NIGHT", store.curated); resultSection("ON EVERYONE'S LIST", store.popular); resultSection("DISHES PEOPLE LOVE", store.popularDishes) }
     }
     private func errorState(_ error: String) -> some View {
         ContentUnavailableView("Explore needs a connection", systemImage: "wifi.exclamationmark", description: Text(error)).frame(maxWidth: .infinity).padding(.vertical, 40)
@@ -78,6 +83,31 @@ struct ExploreView: View {
         }
     }
 }
+
+private struct DirectoryFiltersView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var filters: DirectoryFilters
+    @State private var cuisine = ""
+    @State private var neighborhood = ""
+    @State private var price = 0
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Cuisine") { TextField("Any cuisine", text: $cuisine).textInputAutocapitalization(.words).accessibilityIdentifier("directory.filterCuisine") }
+                Section("Neighborhood") { TextField("Any Atlanta neighborhood", text: $neighborhood).textInputAutocapitalization(.words).accessibilityIdentifier("directory.filterNeighborhood") }
+                Section("Price") { Picker("Price", selection: $price) { Text("Any").tag(0); ForEach(1...4, id: \.self) { Text(String(repeating: "$", count: $0)).tag($0) } }.pickerStyle(.segmented) }
+            }
+            .navigationTitle("Filter Explore")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Reset") { filters = .init(); cuisine = ""; neighborhood = ""; price = 0 } }
+                ToolbarItem(placement: .confirmationAction) { Button("Show results") { filters = .init(cuisine: cuisine.trimmedNil, neighborhood: neighborhood.trimmedNil, priceLevel: price == 0 ? nil : price); dismiss() }.accessibilityIdentifier("directory.applyFilters") }
+            }
+            .onAppear { cuisine = filters.cuisine ?? ""; neighborhood = filters.neighborhood ?? ""; price = filters.priceLevel ?? 0 }
+        }
+    }
+}
+
+private extension String { var trimmedNil: String? { let value = trimmingCharacters(in: .whitespacesAndNewlines); return value.isEmpty ? nil : value } }
 
 private struct ResultRow: View {
     let result: DirectoryResult

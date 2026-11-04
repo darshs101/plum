@@ -70,5 +70,5 @@ ok('Edit post atomically',request('/rest/v1/rpc/save_post',at,'POST',params))
 refreshed=ok('Refresh session (relaunch equivalent API check)',request('/auth/v1/token?grant_type=refresh_token',method='POST',body={'refresh_token':a['refresh']}));a['token']=refreshed['access_token'];a['refresh']=refreshed['refresh_token']
 ok('Persistence after fresh session',rest('posts',a['token'],query='?id=eq.'+pid))
 json.dump(qa,open(sys.argv[2],'w'))
-json.dump({'passed':results,'signup':'BLOCKED: email confirmation enabled; email send rate limit exhausted'},open('/tmp/plum-integration-results.json','w'),indent=2)
+json.dump({'passed':results,'signup':'Not exercised by this script; use the fresh simulator signup test.'},open('/tmp/plum-integration-results.json','w'),indent=2)
 print('PASSED',len(results),'checks')

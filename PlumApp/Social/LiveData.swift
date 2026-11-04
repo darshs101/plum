@@ -37,7 +37,7 @@ enum PlumAPI {
         var rows = rows
         for i in rows.indices {
             rows[i].post_photos.sort { $0.position < $1.position }
-            for j in rows[i].post_photos.indices { rows[i].post_photos[j].url = try await client.storage.from("post-media").createSignedURL(path: rows[i].post_photos[j].storage_path, expiresIn: 300) }
+            for j in rows[i].post_photos.indices { rows[i].post_photos[j].url = try? await client.storage.from("post-media").createSignedURL(path: rows[i].post_photos[j].storage_path, expiresIn: 300) }
         }
         return rows
     }

@@ -22,11 +22,13 @@
 		57939EC433EB83114D21E7AB /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D907DA15EC4FB3F8081BAE27 /* PostDetailView.swift */; };
 		5819B4845E8DFB2640629C3C /* NotificationRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716EAF48E616FD6735084E60 /* NotificationRegistration.swift */; };
 		5BC94C368665B7A39C942C35 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38205E8225ABE3E289D31FCE /* ProfileView.swift */; };
+		72E46433DE35F0EDE20A90EC /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C74B8DC858D6E7B75EBF11A8 /* README.md */; };
 		74A18D67473DC67BB3060CB7 /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE06C09058DD6B58EAADF4E7 /* EditPostView.swift */; };
 		755C58BC3015DB9B229EF7BF /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */; };
 		82DD756DEEB6A3D8E0CFD968 /* PlumStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3BC27E00A05258EDC1CFD1 /* PlumStyle.swift */; };
 		8624863B5B4310927D954018 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AC7106C390BF2552E60BA6 /* CreatePostView.swift */; };
 		98DEE50B210EAFE83BE74736 /* AddRestaurantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1122C69533EC3DF3D6C7A75 /* AddRestaurantView.swift */; };
+		9F4619781F544DEEA019B4AC /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239080F928F533C99B1F1942 /* AppNavigation.swift */; };
 		A35E599BA5489644E062BE7E /* SocialActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31EFD115951F898BD54F1A /* SocialActionsView.swift */; };
 		A541DC3805073495C353361B /* DirectoryServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5DC53A4B41FD4716F3C58D /* DirectoryServices.swift */; };
 		AA410463365A322ED218D223 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116AF927487E0D2528A13D22 /* HomeView.swift */; };
@@ -55,6 +57,7 @@
 		116AF927487E0D2528A13D22 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		128A35C5FECF167D8AE98A0F /* SupabaseSocialClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseSocialClient.swift; sourceTree = "<group>"; };
 		20243E690023D4C7E4C75A13 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		239080F928F533C99B1F1942 /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
 		26E78E8DD8D6C5D9990F01E3 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		2F0108408EDCBBEF132B4ED7 /* PlumServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlumServices.swift; sourceTree = "<group>"; };
 		2F8D7C6A0AE6253E824DEB39 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
@@ -77,6 +80,7 @@
 		A75B1EB341730705655281E3 /* DirectoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryDetailView.swift; sourceTree = "<group>"; };
 		ADF14AB32869152306A29C4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B1122C69533EC3DF3D6C7A75 /* AddRestaurantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRestaurantView.swift; sourceTree = "<group>"; };
+		C74B8DC858D6E7B75EBF11A8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D907DA15EC4FB3F8081BAE27 /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		DB54A85AEE591AEC218D4966 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		DE06C09058DD6B58EAADF4E7 /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
@@ -149,6 +153,7 @@
 		67072D2170E152CF7610631A /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				239080F928F533C99B1F1942 /* AppNavigation.swift */,
 				716EAF48E616FD6735084E60 /* NotificationRegistration.swift */,
 				2F0108408EDCBBEF132B4ED7 /* PlumServices.swift */,
 				9A4885793BCDB3A5ADD77C4B /* SessionStore.swift */,
@@ -197,6 +202,7 @@
 			children = (
 				ADF14AB32869152306A29C4F /* Info.plist */,
 				7A2970D1DB92C3B3B480E2E6 /* PlumFlowTests.swift */,
+				C74B8DC858D6E7B75EBF11A8 /* README.md */,
 			);
 			name = PlumUITests;
 			path = Tests/PlumUITests;
@@ -246,6 +252,7 @@
 			buildConfigurationList = F37275E7F5EEC31641D2C76D /* Build configuration list for PBXNativeTarget "PlumUITests" */;
 			buildPhases = (
 				59887374538F479E95769875 /* Sources */,
+				6BE0B37C3E8F265F8E439E9C /* Resources */,
 			);
 			buildRules = (
 			);
@@ -315,6 +322,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		6BE0B37C3E8F265F8E439E9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72E46433DE35F0EDE20A90EC /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		58C2019EA4C1985FDE222E9A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -322,6 +340,7 @@
 			files = (
 				98DEE50B210EAFE83BE74736 /* AddRestaurantView.swift in Sources */,
 				20D9219342DDB7064BB5D77B /* AdminConsoleView.swift in Sources */,
+				9F4619781F544DEEA019B4AC /* AppNavigation.swift in Sources */,
 				2849790DD1FD2048128A36DA /* CollectionsView.swift in Sources */,
 				8624863B5B4310927D954018 /* CreatePostView.swift in Sources */,
 				FCF38722A405CBA6E339C72F /* DirectoryDetailView.swift in Sources */,
@@ -378,6 +397,8 @@
 				INFOPLIST_FILE = Tests/PlumUITests/Info.plist;
 				INFOPLIST_KEY_PLUM_QA_EMAIL = "$(PLUM_QA_EMAIL)";
 				INFOPLIST_KEY_PLUM_QA_PASSWORD = "$(PLUM_QA_PASSWORD)";
+				INFOPLIST_KEY_PLUM_QA_SIGNUP_EMAIL = "$(PLUM_QA_SIGNUP_EMAIL)";
+				INFOPLIST_KEY_PLUM_QA_SIGNUP_USERNAME = "$(PLUM_QA_SIGNUP_USERNAME)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -563,6 +584,8 @@
 				INFOPLIST_FILE = Tests/PlumUITests/Info.plist;
 				INFOPLIST_KEY_PLUM_QA_EMAIL = "$(PLUM_QA_EMAIL)";
 				INFOPLIST_KEY_PLUM_QA_PASSWORD = "$(PLUM_QA_PASSWORD)";
+				INFOPLIST_KEY_PLUM_QA_SIGNUP_EMAIL = "$(PLUM_QA_SIGNUP_EMAIL)";
+				INFOPLIST_KEY_PLUM_QA_SIGNUP_USERNAME = "$(PLUM_QA_SIGNUP_USERNAME)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

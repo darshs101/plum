@@ -79,7 +79,7 @@ struct EditCollectionView: View {
     }
     var body: some View {
         NavigationStack { Form {
-            TextField("Title", text: $title)
+            TextField("Title", text: $title).accessibilityIdentifier("collection.settings.title")
             Toggle("Public", isOn: $isPublic)
             if collection.kind != "saved_places" { Toggle("Ranked list", isOn: $ranked) }
             if let error { Text(error).foregroundStyle(.red) }
@@ -87,7 +87,7 @@ struct EditCollectionView: View {
                 struct Update: Encodable { let title: String; let kind: String; let is_public: Bool }
                 _ = try await PlumAPI.client.from("collections").update(Update(title: title, kind: collection.kind == "saved_places" ? "saved_places" : ranked ? "ranked" : "standard", is_public: isPublic)).eq("id", value: collection.id).execute()
                 onChanged(false); dismiss()
-            } catch { self.error = error.localizedDescription } } }.disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            } catch { self.error = error.localizedDescription } } }.accessibilityIdentifier("collection.settings.save").disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             if collection.kind != "saved_places" { Button("Delete collection", role: .destructive) { deleting = true }.disabled(working) }
         }.navigationTitle("Collection settings").toolbar { Button("Cancel") { dismiss() }.disabled(working) }
         .confirmationDialog("Delete this collection? Saved restaurants and posts remain on Plum.", isPresented: $deleting) { Button("Delete collection", role: .destructive) { working = true; Task { defer { working = false }; do { _ = try await PlumAPI.client.from("collections").delete().eq("id", value: collection.id).execute(); onChanged(true); dismiss() } catch { self.error = error.localizedDescription } } } }

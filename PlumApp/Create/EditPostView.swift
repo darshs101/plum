@@ -12,6 +12,8 @@ struct EditPostView: View {
     @State private var query = ""
     @State private var results: [DirectoryResult] = []
     @State private var newDish = ""
+    @State private var dishSuggestions: [DirectoryResult] = []
+    @State private var replacementTarget: UUID?
     @State private var newRating = 4.0
     @State private var added: [SavePostDish] = []
     @State private var addedNames: [String] = []
@@ -30,26 +32,28 @@ struct EditPostView: View {
         NavigationStack { Form {
             Section("Restaurant") {
                 Text(restaurantID == post.restaurant_id ? post.restaurants?.name ?? "Restaurant" : "New restaurant selected")
-                TextField("Search another location", text: $query)
+                TextField("Search another location", text: $query).accessibilityIdentifier("edit.restaurantSearch")
                 ForEach(results.filter { $0.kind == .restaurant }) { result in Button(result.title) { if restaurantID != result.id { ratings = []; added = []; addedNames = [] }; restaurantID = result.id; query = ""; results = [] } }
             }
             Section("Dishes & ratings") {
-                ForEach($ratings) { $rating in VStack(alignment: .leading) { Text(rating.dishes?.name ?? "Dish"); Stepper("\(rating.rating.formatted()) stars", value: $rating.rating, in: 0.5...5, step: 0.5); Button("Remove dish", role: .destructive) { ratings.removeAll { $0.id == rating.id } } } }
+                ForEach($ratings) { $rating in VStack(alignment: .leading) { Text(rating.dishes?.name ?? "Dish"); Stepper("\(rating.rating.formatted()) stars", value: $rating.rating, in: 0.5...5, step: 0.5).accessibilityIdentifier("edit.rating.\(rating.id.uuidString)"); HStack { Button("Replace") { replacementTarget = rating.id; newDish = ""; dishSuggestions = [] }; Button("Remove dish", role: .destructive) { ratings.removeAll { $0.id == rating.id } } } } }
                 ForEach(Array(addedNames.enumerated()), id: \.offset) { index, name in HStack { Text(name); Spacer(); Text(added[index].rating.formatted()); Button("Remove") { added.remove(at: index); addedNames.remove(at: index) } } }
-                TextField("Add a dish", text: $newDish)
+                TextField(replacementTarget == nil ? "Add a dish" : "Replace with a dish", text: $newDish).accessibilityIdentifier("edit.dishName")
+                ForEach(dishSuggestions.prefix(5)) { suggestion in Button(suggestion.title) { newDish = suggestion.title; addDish(id: suggestion.id, name: suggestion.title) } }
                 Stepper("\(newRating.formatted()) stars", value: $newRating, in: 0.5...5, step: 0.5)
-                Button("Add dish") { working = true; Task { defer { working = false }; do { let matches = try await PlumServices.directory.search(query: newDish, filters: .init()).filter { $0.kind == .dish && $0.restaurantID == restaurantID && $0.title.lowercased() == newDish.lowercased() }; let id: UUID; if let existing = matches.first { id = existing.id } else { id = try await PlumServices.directory.createDish(restaurantID: restaurantID, name: newDish).id }; added.append(.init(dish_id: id, rating: newRating)); addedNames.append(newDish); newDish = "" } catch { self.error = error.localizedDescription } } }.disabled(newDish.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || working)
+                Button(replacementTarget == nil ? "Add dish" : "Replace dish") { Task { await resolveAndAddDish() } }.disabled(newDish.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || working)
             }
             Section("Photos") {
-                ForEach(photos) { photo in HStack { AsyncImage(url: photo.url) { $0.resizable().scaledToFit() } placeholder: { ProgressView() }.frame(height: 90); Spacer(); Button("Remove", role: .destructive) { photos.removeAll { $0.id == photo.id } } } }
+                ForEach(photos) { photo in HStack { AsyncImage(url: photo.url) { phase in switch phase { case .success(let image): image.resizable().scaledToFit(); case .failure: Label("Photo unavailable", systemImage: "exclamationmark.triangle").foregroundStyle(.secondary); default: ProgressView().frame(width: 90, height: 90) } }.frame(width: 120, height: 90); Spacer(); Button("Remove", role: .destructive) { photos.removeAll { $0.id == photo.id } }.accessibilityIdentifier("edit.removePhoto.\(photo.id.uuidString)") } }
                 PhotosPicker(selection: $newPhotos, maxSelectionCount: 8, matching: .images) { Text("Add photos") }
             }
-            Section("Details") { TextField("Caption", text: $caption, axis: .vertical); Toggle("Visit date", isOn: $includesDate); if includesDate { DatePicker("Date", selection: $date, in: ...Date(), displayedComponents: .date) } }
+            Section("Details") { TextField("Caption", text: $caption, axis: .vertical).accessibilityIdentifier("edit.caption"); Toggle("Visit date", isOn: $includesDate); if includesDate { DatePicker("Date", selection: $date, in: ...Date(), displayedComponents: .date) } }
             if let error { Text(error).foregroundStyle(.red) }
-            Button("Save changes") { Task { await save() } }.disabled(working || (ratings.isEmpty && added.isEmpty) || (photos.isEmpty && newPhotos.isEmpty))
+            Button("Save changes") { Task { await save() } }.disabled(working || (ratings.isEmpty && added.isEmpty) || (photos.isEmpty && newPhotos.isEmpty)).accessibilityIdentifier("edit.save")
             if working { ProgressView("Saving…") }
-        }.navigationTitle("Edit tasting").toolbar { Button("Cancel") { dismiss() }.disabled(working) }
-        .task(id: query) { guard !query.isEmpty else { return }; do { results = try await PlumServices.directory.search(query: query, filters: .init()) } catch { self.error = error.localizedDescription } }
+        }.disabled(working).navigationTitle("Edit tasting").toolbar { Button("Cancel") { dismiss() }.disabled(working) }
+        .task(id: query) { await searchRestaurants() }
+        .task(id: newDish) { await searchDishes() }
         }
     }
     private func save() async {
@@ -63,7 +67,44 @@ struct EditPostView: View {
                 try await PlumAPI.client.storage.from("post-media").upload(path + ".original", data: data, options: .init(contentType: item.supportedContentTypes.first?.preferredMIMEType ?? "application/octet-stream"))
             }
             let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
-            _ = try await PlumAPI.client.rpc("save_post", params: SavePostParams(post_uuid: post.id, restaurant_uuid: restaurantID, dish_entries: ratings.map { .init(dish_id: $0.dish_id, rating: $0.rating) } + added, photo_paths: photos.map(\.storage_path) + uploaded, caption_text: caption.isEmpty ? nil : caption, visited_on: includesDate ? formatter.string(from: date) : nil)).execute(); dismiss()
+            let entries = ratings.map { SavePostDish(dish_id: $0.dish_id, rating: $0.rating) } + added
+            let paths = photos.map(\.storage_path) + uploaded
+            // Existing photos may be associated with every remaining dish; new photos
+            // initially illustrate all dishes. This preserves the multi-dish invariant
+            // without silently dropping a photo when a dish is edited.
+            let links = paths.map { SavePostPhotoLink(photo_path: $0, dish_ids: entries.map(\.dish_id)) }
+            _ = try await PlumAPI.client.rpc("save_post", params: SavePostParams(post_uuid: post.id, restaurant_uuid: restaurantID, dish_entries: entries, photo_paths: paths, caption_text: caption.isEmpty ? nil : caption, visited_on: includesDate ? formatter.string(from: date) : nil, photo_links: links)).execute(); dismiss()
         } catch { if !uploaded.isEmpty { _ = try? await PlumAPI.client.storage.from("post-media").remove(paths: uploaded + uploaded.map { $0 + ".original" }) }; self.error = error.localizedDescription }
+    }
+
+    private func searchRestaurants() async {
+        let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !term.isEmpty else { results = []; return }
+        do { try await Task.sleep(for: .milliseconds(200)); let found = try await PlumServices.directory.search(query: term, filters: .init()); guard !Task.isCancelled, term == query.trimmingCharacters(in: .whitespacesAndNewlines) else { return }; results = found.filter { $0.kind == .restaurant } }
+        catch { if !Task.isCancelled { self.error = error.localizedDescription } }
+    }
+    private func searchDishes() async {
+        let term = newDish.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !term.isEmpty else { dishSuggestions = []; return }
+        do { try await Task.sleep(for: .milliseconds(180)); let found = try await PlumServices.directory.search(query: term, filters: .init()); guard !Task.isCancelled, term == newDish.trimmingCharacters(in: .whitespacesAndNewlines) else { return }; dishSuggestions = found.filter { $0.kind == .dish && $0.restaurantID == restaurantID } }
+        catch { if !Task.isCancelled { self.error = error.localizedDescription } }
+    }
+    private func resolveAndAddDish() async {
+        let name = newDish.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        working = true; defer { working = false }
+        do {
+            let matches = try await PlumServices.directory.search(query: name, filters: .init()).filter { $0.kind == .dish && $0.restaurantID == restaurantID && $0.title.compare(name, options: .caseInsensitive) == .orderedSame }
+            let id: UUID
+            if let existing = matches.first { id = existing.id }
+            else { id = try await PlumServices.directory.createDish(restaurantID: restaurantID, name: name).id }
+            addDish(id: id, name: name)
+        } catch { self.error = error.localizedDescription }
+    }
+    private func addDish(id: UUID, name: String) {
+        let existing = ratings.map(\.dish_id) + added.map(\.dish_id)
+        guard !existing.contains(id) else { error = "That dish is already in this tasting."; return }
+        if let replacementTarget { ratings.removeAll { $0.id == replacementTarget }; self.replacementTarget = nil }
+        added.append(.init(dish_id: id, rating: newRating)); addedNames.append(name); newDish = ""; dishSuggestions = []
     }
 }
