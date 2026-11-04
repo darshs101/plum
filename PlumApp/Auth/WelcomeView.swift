@@ -12,6 +12,8 @@ struct WelcomeView: View {
     @State private var error: String?
     @State private var confirmationPending = false
     @State private var code = ""
+    @AppStorage("plum.welcomeIntroduced") private var welcomeIntroduced = false
+    @State private var welcomeVisible = UserDefaults.standard.bool(forKey: "plum.welcomeIntroduced")
 
     var body: some View {
         NavigationStack {
@@ -28,18 +30,29 @@ struct WelcomeView: View {
         VStack(alignment: .leading, spacing: 18) {
             Spacer()
             Text("A food journal\nfor your city.").font(.system(size: 38, weight: .semibold, design: .serif)).foregroundStyle(.plum)
+                .modifier(WelcomeEntrance(visible: welcomeVisible, order: 0))
             Text("Log dishes, save places, and follow people whose taste you trust.").foregroundStyle(.secondary)
-            SignInWithAppleButton(.continue) { session.prepareApple($0) } onCompletion: { result in
-                run { try await session.signInWithApple(result.get()) }
-            }.signInWithAppleButtonStyle(.black).frame(height: 50).disabled(working)
-            Button { run { try await session.signInWithGoogle() } } label: {
-                Label("Continue with Google", systemImage: "g.circle").frame(maxWidth: .infinity)
-            }.buttonStyle(PlumActionStyle(emphasis: .secondary)).disabled(working)
-            Button("Create an account with email") { creatingAccount = true; showEmail = true }.buttonStyle(PlumActionStyle()).disabled(working)
-            Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity).foregroundStyle(.plum).disabled(working)
+                .modifier(WelcomeEntrance(visible: welcomeVisible, order: 1))
+            VStack(spacing: 18) {
+                SignInWithAppleButton(.continue) { session.prepareApple($0) } onCompletion: { result in
+                    run { try await session.signInWithApple(result.get()) }
+                }.signInWithAppleButtonStyle(.black).frame(height: 50).disabled(working)
+                Button { run { try await session.signInWithGoogle() } } label: {
+                    Label("Continue with Google", systemImage: "g.circle").frame(maxWidth: .infinity)
+                }.buttonStyle(PlumActionStyle(emphasis: .secondary)).disabled(working)
+                Button("Create an account with email") { creatingAccount = true; showEmail = true }.buttonStyle(PlumActionStyle()).disabled(working)
+                Button("Already have an account? Sign in") { creatingAccount = false; showEmail = true }.frame(maxWidth: .infinity).foregroundStyle(.plum).disabled(working)
+            }
+            .modifier(WelcomeEntrance(visible: welcomeVisible, order: 2))
             if working { ProgressView("Signing in…").frame(maxWidth: .infinity) }
             Spacer()
         }.padding(24)
+            .onAppear {
+                // Only the first welcome receives an entrance. Returning from a
+                // form or signing out later must leave authentication immediate.
+                welcomeIntroduced = true
+                welcomeVisible = true
+            }
     }
     private var validUsername: Bool { username.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().range(of: "^[a-z0-9_]{3,30}$", options: .regularExpression) != nil }
     private var emailForm: some View {
@@ -80,6 +93,19 @@ struct WelcomeView: View {
         guard !working else { return }
         working = true
         Task { defer { working = false }; do { try await action() } catch { self.error = error.localizedDescription } }
+    }
+}
+
+private struct WelcomeEntrance: ViewModifier {
+    let visible: Bool
+    let order: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(visible ? 1 : 0)
+            .offset(y: visible || reduceMotion ? 0 : PlumStyle.Motion.entranceOffset)
+            .animation(PlumStyle.Motion.entrance.delay(reduceMotion ? 0 : Double(order) * PlumStyle.Motion.entranceStagger), value: visible)
     }
 }
 

@@ -4,6 +4,12 @@ enum PlumStyle {
     static let cream = Color(red: 0.98, green: 0.95, blue: 0.89)
     static let plum = Color.plum
     static let cornerRadius: CGFloat = 16
+
+    enum Motion {
+        static let entrance = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.3)
+        static let entranceStagger = 0.05
+        static let entranceOffset: CGFloat = 8
+    }
 }
 
 /// Used for infrequent actions. Routine rows and tab switches retain native,
